@@ -67,13 +67,13 @@ public class UserService {
         System.out.print("Please enter your password: ");
         String password = sc.nextLine();
         if (userRepository.findByUsername(emailOrUsername) != null) {
-            if (userRepository.findByUsername(emailOrUsername).getPassword().equals(password)) {
+            if (userRepository.findByUsername(emailOrUsername).getPassword().equals(String.valueOf(password.hashCode()))) {
                 loggedInUser = userRepository.findByUsername(emailOrUsername);
                 System.out.println("\n>>> Logged in successfully!");
             }
         }
         if (userRepository.findByEmail(emailOrUsername) != null) {
-            if (userRepository.findByEmail(emailOrUsername).getPassword().equals(password)) {
+            if (userRepository.findByEmail(emailOrUsername).getPassword().equals(String.valueOf(password.hashCode()))) {
                 loggedInUser = userRepository.findByEmail(emailOrUsername);
                 System.out.println("\n>>> Logged in successfully!");
             }

@@ -38,7 +38,7 @@ public class UserRepository {
         var statement = Datasource.getConnection().prepareStatement(INSERT_SQL);
         statement.setString(1, user.getEmail());
         statement.setString(2, user.getUsername());
-        statement.setString(3, user.getPassword());
+        statement.setString(3, String.valueOf(user.getPassword().hashCode()));
         statement.setString(4, user.getDisplayName());
         statement.setString(5, user.getBio());
         statement.setDate(6, Date.valueOf(user.getCreated()));
