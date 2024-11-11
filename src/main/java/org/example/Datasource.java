@@ -1,15 +1,17 @@
+package org.example;
+
 import lombok.Getter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DataSource {
+public class Datasource {
 
     @Getter
     private static final Connection connection;
 
-    private DataSource() {
+    private Datasource() {
     }
 
     static {
