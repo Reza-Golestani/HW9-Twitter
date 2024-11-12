@@ -9,7 +9,6 @@ import java.sql.SQLException;
 
 public class UserRepository {
 
-
     private static final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS users (
             id bigserial PRIMARY KEY NOT NULL,

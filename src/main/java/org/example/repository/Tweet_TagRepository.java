@@ -1,6 +1,6 @@
 package org.example.repository;
 
-public class TagRepository {
+public class Tweet_TagRepository {
     public static void initTable(){
 
     }

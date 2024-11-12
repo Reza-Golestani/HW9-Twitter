@@ -1,15 +1,23 @@
 package org.example;
 
-import org.example.repository.UserRepository;
+import org.example.entity.Tweet;
+import org.example.repository.*;
+import org.example.service.TweetService;
 import org.example.service.UserService;
 
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
 
         UserRepository.initTable();
+        TweetRepository.initTable();
+        TagRepository.initTable();
+        ReactionRepository.initTable();
+        Tweet_TagRepository.initTable();
 
         while (true) {
             while (UserService.loggedInUser == null) {
@@ -39,9 +47,9 @@ public class Main {
     private static void homePage() throws SQLException {
         Scanner sc = new Scanner(System.in);
         System.out.println("\n------------- Home Page ------------\n");
-        System.out.println("1- All tweets");
-        System.out.println("2- Your tweets");
-        System.out.println("3- Post a new tweet");
+        System.out.println("1- All tweets"); // view, react, retweet
+        System.out.println("2- Your tweets"); // view, edit, delete
+        System.out.println("3- Post a new tweet"); // create
         System.out.println("4- Edit your profile");
         System.out.println("0- Sign out");
         System.out.print("\n>>> Enter your choice: ");
@@ -51,7 +59,7 @@ public class Main {
         } else if (choice.equals("2")) {
 
         } else if (choice.equals("3")) {
-
+            newTweetMenu();
         } else if (choice.equals("4")) {
             editProfileMenu();
         } else if (choice.equals("0")) {
@@ -106,4 +114,33 @@ public class Main {
             homePage();
         }
     }
+
+    public static void newTweetMenu() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\n------------ New Tweet -------------\n");
+        System.out.println("Enter your new tweet (Max: 280 characters): ");
+        String newTweetText = sc.nextLine();
+        while (!(newTweetText.length() > 280)) {
+            System.out.println("Too long tweet! Max allowed length is 280 characters, try again: ");
+            newTweetText = sc.nextLine();
+        }
+        System.out.println("Enter tags (enter '0' to finish): ");
+        Set<String> tagTitles = new HashSet<>();
+        String newTagTitle = sc.nextLine();
+        while (!newTagTitle.equals("0")) {
+            newTagTitle = sc.nextLine();
+            tagTitles.add(newTagTitle);
+        }
+        System.out.print("Post this new tweet? (y/n): ");
+        String choice = sc.nextLine();
+        if (choice.equals("y")) {
+            Tweet newTweet = TweetService.create(newTweetText, tagTitles);
+            TweetRepository.save(newTweet);
+        } else if (choice.equals("n")) {
+            System.out.println("\n>>> New tweet canceled!");
+            homePage();
+        }
+    }
+
+
 }

@@ -5,7 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -16,9 +19,8 @@ public class Tweet {
     private String text;
     private Tweet retweetTo;
     private User writer;
-    private List<User> likedBy;
-    private List<User> dislikedBy;
+    private Set<String> tags = new HashSet<>();
+    private List<Reaction> reactions = new ArrayList<>();
     private LocalDateTime createdAt;
     private LocalDateTime editedAt;
-    private List<Tag> tags;
 }
