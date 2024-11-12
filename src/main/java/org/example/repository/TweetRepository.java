@@ -13,10 +13,11 @@ public class TweetRepository {
     private static final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS tweets (
             id bigserial PRIMARY KEY NOT NULL,
-            text varchar(280) UNIQUE NOT NULL,
-            user_id bigint UNIQUE NOT NULL,
+            text varchar(280) NOT NULL,
+            user_id bigint NOT NULL,
             created_at timestamp NOT NULL,
             updated_at timestamp
+            FOREIGN KEY (user_id) REFERENCES users
             );
             """;
 
