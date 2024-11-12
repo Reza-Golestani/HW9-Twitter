@@ -16,7 +16,7 @@ public class UserRepository {
             email varchar(50) UNIQUE NOT NULL,
             username varchar(50) UNIQUE NOT NULL,
             password varchar(50) NOT NULL,
-            display_name varchar(50) NOT NULL,
+            displayed_name varchar(50) NOT NULL,
             bio varchar(250),
             created_at Date NOT NULL
             );
@@ -29,7 +29,7 @@ public class UserRepository {
     }
 
     private static String INSERT_SQL = """
-            INSERT INTO users (email, username, password, display_name, bio, created_at)
+            INSERT INTO users (email, username, password, displayed_name, bio, created_at)
             VALUES (?, ?, ?, ?, ?, ?)
             RETURNING id;
             """;
@@ -39,7 +39,7 @@ public class UserRepository {
         statement.setString(1, user.getEmail());
         statement.setString(2, user.getUsername());
         statement.setString(3, String.valueOf(user.getPassword().hashCode()));
-        statement.setString(4, user.getDisplayName());
+        statement.setString(4, user.getDisplayedName());
         statement.setString(5, user.getBio());
         statement.setDate(6, Date.valueOf(user.getCreated()));
 
@@ -108,7 +108,7 @@ private static String CHECK_USERNAME_AVAILABILITY_SQL = """
                 user.setEmail(resultSet.getString(2));
                 user.setUsername(resultSet.getString(3));
                 user.setPassword(resultSet.getString(4));
-                user.setDisplayName(resultSet.getString(5));
+                user.setDisplayedName(resultSet.getString(5));
                 user.setBio(resultSet.getString(6));
                 user.setCreated(resultSet.getDate(7).toLocalDate());
                 statement.close();
@@ -129,7 +129,7 @@ private static String CHECK_USERNAME_AVAILABILITY_SQL = """
                 user.setEmail(resultSet.getString(2));
                 user.setUsername(resultSet.getString(3));
                 user.setPassword(resultSet.getString(4));
-                user.setDisplayName(resultSet.getString(5));
+                user.setDisplayedName(resultSet.getString(5));
                 user.setBio(resultSet.getString(6));
                 user.setCreated(resultSet.getDate(7).toLocalDate());
             statement.close();
@@ -138,6 +138,54 @@ private static String CHECK_USERNAME_AVAILABILITY_SQL = """
             statement.close();
             return null;
         }
+    }
+
+    public void updateUser(User user) throws SQLException {
+        long id = user.getId();
+        String UPDATE_EMAIL = """
+                UPDATE users
+                SET email = ?
+                WHERE id = ?
+                """;
+        String UPDATE_USERNAME = """
+                UPDATE users
+                SET username = ?
+                WHERE id = ?
+                """;
+        String UPDATE_PASSWORD = """
+                UPDATE users
+                SET password = ?
+                WHERE id = ?
+                """;
+        String UPDATE_DISPLAYED_NAME = """
+                UPDATE users
+                SET  displayed_name= ?
+                WHERE id = ?
+                """;
+        String UPDATE_BIO = """
+                UPDATE users
+                SET bio = ?
+                WHERE id = ?
+                """;
+        String UPDATE_USER = """
+                UPDATE users
+                SET email = ?,
+                username = ?,
+                password = ?,
+                displayed_name= ?,
+                bio = ?
+                WHERE id = ?
+                """;
+        var statement = Datasource.getConnection().prepareStatement(UPDATE_USER);
+        statement.setString(1, user.getEmail());
+        statement.setString(2, user.getUsername());
+        statement.setString(3, user.getPassword());
+        statement.setString(4, user.getDisplayedName());
+        statement.setString(5, user.getBio());
+        statement.setLong(6, user.getId());
+
+        statement.executeUpdate();
+        statement.close();
     }
 
 

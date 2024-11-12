@@ -42,8 +42,8 @@ public class UserService {
         user.setPassword(password);
 
         System.out.print("please enter your displayed name: ");
-        String displayName = sc.nextLine();
-        user.setDisplayName(displayName);
+        String displayedName = sc.nextLine();
+        user.setDisplayedName(displayedName);
 
         System.out.println("please enter your bio: ");
         String bio = sc.nextLine();
@@ -82,9 +82,16 @@ public class UserService {
         if (loggedInUser == null) {
             System.out.println("\n>>> Invalid email/username or password!");
         }
-
     }
 
+    public static void signOut() {
+        loggedInUser = null;
+        System.out.println("\nYou have been logged out successfully!");
+    }
+
+    public static void updateUser(User user) throws SQLException {
+        userRepository.updateUser(user);
+    }
 }
 
 
