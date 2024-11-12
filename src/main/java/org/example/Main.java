@@ -68,8 +68,11 @@ public class Main {
     }
 
     private static void editProfileMenu() throws SQLException {
+
         // todo: show the current values to user while asking for new ones
+        UserRepository userRepository = new UserRepository();
         Scanner sc = new Scanner(System.in);
+
         System.out.println("\n------------ Edit Profile -----------\n");
         System.out.println("1- Edit your Email");
         System.out.println("2- Edit your Username");
@@ -82,11 +85,20 @@ public class Main {
         if (choice.equals("1")) {
             System.out.print("Enter your new email: ");
             String newEmail = sc.nextLine();
+            while (!userRepository.isEmailAvailable(newEmail)) {
+                System.out.print("This email is already in use. Try another one: ");
+                newEmail = sc.nextLine();
+            }
             UserService.loggedInUser.setEmail(newEmail);
             UserService.updateUser(UserService.loggedInUser);
+            System.out.println("\n>>> Email successfully updated!");
         } else if (choice.equals("2")) {
             System.out.print("Enter your new username: ");
             String newUsername = sc.nextLine();
+            while (!userRepository.isUsernameAvailable(newUsername)) {
+                System.out.print("This username is already in use. Try another one: ");
+                newUsername = sc.nextLine();
+            }
             UserService.loggedInUser.setUsername(newUsername);
             UserService.updateUser(UserService.loggedInUser);
         } else if (choice.equals("3")) {
@@ -100,16 +112,19 @@ public class Main {
             String newPassword = sc.nextLine();
             UserService.loggedInUser.setPassword(newPassword);
             UserService.updateUser(UserService.loggedInUser);
+            System.out.println("\n>>> Password successfully updated!");
         } else if (choice.equals("4")) {
             System.out.print("Enter your new displayed name: ");
             String newDisplayedName = sc.nextLine();
             UserService.loggedInUser.setDisplayedName(newDisplayedName);
             UserService.updateUser(UserService.loggedInUser);
+            System.out.println("\n>>> Displayed name successfully updated!");
         } else if (choice.equals("5")) {
             System.out.println("Enter your new bio: ");
             String newBio = sc.nextLine();
             UserService.loggedInUser.setBio(newBio);
             UserService.updateUser(UserService.loggedInUser);
+            System.out.println("\n>>> Bio successfully updated!");
         } else if (choice.equals("0")) {
             homePage();
         }
@@ -120,7 +135,7 @@ public class Main {
         System.out.println("\n------------ New Tweet -------------\n");
         System.out.println("Enter your new tweet (Max: 280 characters): ");
         String newTweetText = sc.nextLine();
-        while (!(newTweetText.length() > 280)) {
+        while (newTweetText.length() > 280) {
             System.out.println("Too long tweet! Max allowed length is 280 characters, try again: ");
             newTweetText = sc.nextLine();
         }
@@ -131,11 +146,12 @@ public class Main {
             newTagTitle = sc.nextLine();
             tagTitles.add(newTagTitle);
         }
-        System.out.print("Post this new tweet? (y/n): ");
+        System.out.print("\nPost this new tweet? (y/n): ");
         String choice = sc.nextLine();
         if (choice.equals("y")) {
             Tweet newTweet = TweetService.create(newTweetText, tagTitles);
             TweetRepository.save(newTweet);
+            System.out.println("\n>>> New tweet posted!");
         } else if (choice.equals("n")) {
             System.out.println("\n>>> New tweet canceled!");
             homePage();

@@ -24,7 +24,7 @@ public class UserService {
         System.out.print("Please enter your email: ");
         String email = sc.nextLine();
         while (!userRepository.isEmailAvailable(email)) {
-            System.out.print("This email is already in use. Please try another one: ");
+            System.out.print("This email is already in use. Try another one: ");
             email = sc.nextLine();
         }
         user.setEmail(email);
@@ -32,7 +32,7 @@ public class UserService {
         System.out.print("Please enter your username: ");
         String username = sc.nextLine();
         while (!userRepository.isUsernameAvailable(username)) {
-            System.out.print("This username is already in use. Please try another one: ");
+            System.out.print("This username is already in use. Try another one: ");
             username = sc.nextLine();
         }
         user.setUsername(username);
