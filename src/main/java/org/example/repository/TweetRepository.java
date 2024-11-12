@@ -16,7 +16,7 @@ public class TweetRepository {
             text varchar(280) NOT NULL,
             user_id bigint NOT NULL,
             created_at timestamp NOT NULL,
-            updated_at timestamp
+            updated_at timestamp,
             FOREIGN KEY (user_id) REFERENCES users
             );
             """;

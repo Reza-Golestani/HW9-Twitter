@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.entity.Tweet;
 import org.example.repository.*;
+import org.example.service.TagService;
 import org.example.service.TweetService;
 import org.example.service.UserService;
 
@@ -14,10 +15,10 @@ public class Main {
     public static void main(String[] args) throws SQLException {
 
         UserRepository.initTable();
-        TweetRepository.initTable();
         TagRepository.initTable();
-        ReactionRepository.initTable();
+        TweetRepository.initTable();
         Tweet_TagRepository.initTable();
+        ReactionRepository.initTable();
 
         while (true) {
             while (UserService.loggedInUser == null) {
@@ -143,14 +144,16 @@ public class Main {
         Set<String> tagTitles = new HashSet<>();
         String newTagTitle = sc.nextLine();
         while (!newTagTitle.equals("0")) {
-            newTagTitle = sc.nextLine();
             tagTitles.add(newTagTitle);
+            newTagTitle = sc.nextLine();
         }
         System.out.print("\nPost this new tweet? (y/n): ");
         String choice = sc.nextLine();
         if (choice.equals("y")) {
             Tweet newTweet = TweetService.create(newTweetText, tagTitles);
-            TweetRepository.save(newTweet);
+//            TweetRepository.save(newTweet);
+            newTweet.setId(TweetRepository.save(newTweet).getId());
+            TagService.saveTags(newTweet);
             System.out.println("\n>>> New tweet posted!");
         } else if (choice.equals("n")) {
             System.out.println("\n>>> New tweet canceled!");

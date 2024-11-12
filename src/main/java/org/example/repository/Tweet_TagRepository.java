@@ -23,5 +23,15 @@ public class Tweet_TagRepository {
     }
 
     private static String INSERT_TWEET_TAG = """
+            INSERT INTO tweets_tags (tweet_id, tag_id)
+            VALUES (? , ?)
             """;
+
+    public static void save(long TweetId, long tagId) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(INSERT_TWEET_TAG);
+        statement.setLong(1, TweetId);
+        statement.setLong(2, tagId);
+        statement.execute();
+        statement.close();
+    }
 }
