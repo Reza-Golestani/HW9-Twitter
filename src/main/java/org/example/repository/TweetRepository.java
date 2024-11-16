@@ -17,7 +17,9 @@ public class TweetRepository {
             user_id bigint NOT NULL,
             created_at timestamp NOT NULL,
             updated_at timestamp,
-            FOREIGN KEY (user_id) REFERENCES users
+            retweet_to bigint,
+            FOREIGN KEY (user_id) REFERENCES users,
+            FOREIGN KEY (retweet_to) REFERENCES tweets
             );
             """;
 
@@ -47,5 +49,20 @@ public class TweetRepository {
             return newTweet;
         }
     }
+
+    public static String DELETE_TWEET_BY_ID = """
+            DELETE from tweets
+            WHERE id = ?
+            """;
+
+    public static void delete(Tweet tweet) throws SQLException {
+        long id = tweet.getId();
+        var statement = Datasource.getConnection().prepareStatement(DELETE_TWEET_BY_ID);
+        statement.setLong(1, id);
+        statement.execute();
+        statement.close();
+    }
+
+
 
 }

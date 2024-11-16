@@ -1,7 +1,10 @@
 package org.example.repository;
 
 import org.example.Datasource;
+import org.example.entity.Tag;
+import org.example.entity.Tweet;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Tweet_TagRepository {
@@ -34,4 +37,34 @@ public class Tweet_TagRepository {
         statement.execute();
         statement.close();
     }
+
+    public static String DELETE_BY_TWEET_ID = """
+            DELETE FROM tweets_tags
+            WHERE tweet_id = ?
+            """;
+
+    public static void deleteByTweet(Tweet tweet) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(DELETE_BY_TWEET_ID);
+        statement.setLong(1, tweet.getId());
+        statement.execute();
+        statement.close();
+    }
+
+    public static String IS_TAG_USELESS = """
+            SELECT * FROM tweets_tags
+            WHERE tag_id = ? and tweet_id <> ?
+            """;
+
+    public static boolean isTagUseless(long tweetId, long tagId) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(IS_TAG_USELESS);
+        statement.setLong(1, tagId);
+        statement.setLong(2, tweetId);
+        try(ResultSet resultSet = statement.executeQuery()) {
+            if(resultSet.next()){
+                return false;
+            }
+            return true;
+        }
+    }
+
 }

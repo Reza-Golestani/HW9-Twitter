@@ -1,6 +1,7 @@
 package org.example.repository;
 
 import org.example.Datasource;
+import org.example.entity.Tweet;
 
 import java.sql.SQLException;
 
@@ -23,4 +24,14 @@ public class ReactionRepository {
         statement.execute();
         statement.close();
     }
+
+    public static String DELETE_BY_TWEET_ID = "DELETE FROM reactions WHERE tweet_id = ?";
+
+    public static void deleteByTweet(Tweet tweet) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(DELETE_BY_TWEET_ID);
+        statement.setLong(1, tweet.getId());
+        statement.execute();
+        statement.close();
+    }
+
 }

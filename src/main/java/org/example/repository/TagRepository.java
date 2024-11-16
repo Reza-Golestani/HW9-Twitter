@@ -61,4 +61,28 @@ public class TagRepository {
             return false;
         }
     }
+
+    public static long getTagId(String name) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(FIND_TAG);
+        statement.setString(1, name);
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getLong(1);
+            }
+        }
+        statement.close();
+        return 0;
+    }
+
+    public static String DELETE_BY_NAME = """
+                DELETE FROM tags
+                WHERE name = ?
+                """;
+
+    public static void delete(String tag) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(DELETE_BY_NAME);
+        statement.setString(1, tag);
+        statement.execute();
+        statement.close();
+    }
 }
