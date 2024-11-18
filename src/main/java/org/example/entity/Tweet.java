@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,4 +24,22 @@ public class Tweet {
     private List<Reaction> reactions = new ArrayList<>();
     private LocalDateTime createdAt;
     private LocalDateTime editedAt;
+
+    @Override
+    // todo: reactions + retweeted to
+    public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String stringForm =
+          writer.getDisplayedName() + ": " + text + "\n";
+        if (!tags.isEmpty()) {
+            stringForm += "   " + tags + ",";
+        }
+        stringForm +="   posted at " + createdAt.format(formatter);
+
+        return stringForm;
+    }
 }
+
+
+
+

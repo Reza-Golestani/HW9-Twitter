@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.entity.Tweet;
+import org.example.entity.User;
 import org.example.repository.ReactionRepository;
 import org.example.repository.TagRepository;
 import org.example.repository.TweetRepository;
@@ -8,6 +9,7 @@ import org.example.repository.Tweet_TagRepository;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Set;
 
 public class TweetService {
@@ -33,5 +35,13 @@ public class TweetService {
                 }
             }
         }
+    }
+
+    public static ArrayList<Tweet> getAll() throws SQLException {
+        return TweetRepository.getAllTweets();
+    }
+
+    public static ArrayList<Tweet> getAll(User user) throws SQLException {
+        return TweetRepository.getAllTweets(user);
     }
 }

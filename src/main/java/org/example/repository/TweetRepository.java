@@ -2,11 +2,14 @@ package org.example.repository;
 
 import org.example.Datasource;
 import org.example.entity.Tweet;
+import org.example.entity.User;
 import org.example.service.UserService;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 public class TweetRepository {
 
@@ -63,6 +66,67 @@ public class TweetRepository {
         statement.close();
     }
 
+    public static String GET_ALL = """
+            SELECT * FROM tweets JOIN users ON tweets.user_id = users.id
+            """;
 
+        public static String GET_TAGS_NAMES = """
+                SELECT name FROM tweets_tags JOIN tags ON tweets_tags.tag_id = tags.id
+                WHERE tweets_tags.tweet_id = ?
+                """;
 
+    public static HashSet<String> getTags(long tweetId) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(GET_TAGS_NAMES);
+        statement.setLong(1, tweetId);
+        try(ResultSet resultSet = statement.executeQuery()){
+            HashSet<String> tags = new HashSet<>();
+            while (resultSet.next()){
+                tags.add(resultSet.getString("name"));
+            }
+            return tags;
+        }
+    }
+
+    public static ArrayList<Tweet> getAllTweets() throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(GET_ALL);
+        ResultSet resultSet = statement.executeQuery();
+        ArrayList<Tweet> tweets = new ArrayList<>();
+        while(resultSet.next()){
+            Tweet tweet = new Tweet();
+            User writer = new User();
+            writer.setId(resultSet.getLong("user_id"));
+            writer.setDisplayedName(resultSet.getString("displayed_name"));
+            tweet.setWriter(writer);
+            tweet.setId(resultSet.getLong("id"));
+            tweet.setText(resultSet.getString("text"));
+            tweet.setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime());
+            tweet.setTags(getTags(tweet.getId()));
+            tweets.add(tweet);
+        }
+        statement.close();
+        return tweets;
+    }
+
+    public static String GET_ALL_YOURS = """
+            SELECT * FROM tweets JOIN users ON tweets.user_id = users.id
+            WHERE user_id = ?
+            """;
+
+    public static ArrayList<Tweet> getAllTweets(User user) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(GET_ALL_YOURS);
+        statement.setLong(1, user.getId());
+        ResultSet resultSet = statement.executeQuery();
+        ArrayList<Tweet> tweets = new ArrayList<>();
+        while(resultSet.next()){
+            Tweet tweet = new Tweet();
+            tweet.setWriter(user);
+            tweet.setId(resultSet.getLong("id"));
+            tweet.setText(resultSet.getString("text"));
+            tweet.setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime());
+            tweet.setTags(getTags(tweet.getId()));
+            tweets.add(tweet);
+        }
+        statement.close();
+        return tweets;
+    }
 }

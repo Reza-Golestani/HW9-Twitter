@@ -56,9 +56,9 @@ public class Main {
         System.out.print("\n>>> Enter your choice: ");
         String choice = sc.nextLine();
         if (choice.equals("1")) {
-
+            allTweetsMenu();
         } else if (choice.equals("2")) {
-
+            yourTweetsMenu();
         } else if (choice.equals("3")) {
             newTweetMenu();
         } else if (choice.equals("4")) {
@@ -66,6 +66,37 @@ public class Main {
         } else if (choice.equals("0")) {
             UserService.signOut();
         }
+    }
+
+    private static void yourTweetsMenu() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\n------------- Your Tweets ------------\n");
+        int index = 0;
+        for(Tweet tweet: TweetService.getAll(UserService.loggedInUser)){
+            System.out.println(++index + "- " + tweet + "\n");
+        }
+        System.out.print(">>> Enter a tweet's index to view or '0' to go back: ");
+        String choice = sc.nextLine();
+        if (choice.equals("0")) {
+            homePage();
+        }
+    }
+
+    private static void allTweetsMenu() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\n------------- All Tweets ------------\n");
+        int index = 0;
+        for(Tweet tweet: TweetService.getAll()){
+            System.out.println(++index + "- " + tweet + "\n");
+        }
+        System.out.print(">>> Enter a tweet's index to view or '0' to go back: ");
+        String choice = sc.nextLine();
+        if (choice.equals("0")) {
+            homePage();
+        }
+//        else if () {
+//
+//        }
     }
 
     private static void editProfileMenu() throws SQLException {
