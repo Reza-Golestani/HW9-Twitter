@@ -20,9 +20,9 @@ public class TweetRepository {
             user_id bigint NOT NULL,
             created_at timestamp NOT NULL,
             updated_at timestamp,
-            retweet_to bigint,
+            retweeted bigint,
             FOREIGN KEY (user_id) REFERENCES users,
-            FOREIGN KEY (retweet_to) REFERENCES tweets
+            FOREIGN KEY (retweeted) REFERENCES tweets
             );
             """;
 

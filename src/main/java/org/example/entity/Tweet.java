@@ -18,7 +18,7 @@ import java.util.Set;
 public class Tweet {
     private long id;
     private String text;
-    private Tweet retweetTo;
+    private Tweet retweeted;
     private User writer;
     private Set<String> tags = new HashSet<>();
     private List<Reaction> reactions = new ArrayList<>();
