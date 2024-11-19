@@ -44,4 +44,6 @@ public class TweetService {
     public static ArrayList<Tweet> getAll(User user) throws SQLException {
         return TweetRepository.getAllTweets(user);
     }
+
+
 }

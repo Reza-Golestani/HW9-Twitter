@@ -32,11 +32,11 @@ public class TweetRepository {
         statement.close();
     }
 
-      private static String INSERT_TWEET = """
-                INSERT INTO tweets (text, user_id, created_at)
-                VALUES (?, ?, ?)
-                RETURNING id
-                """;
+    private static String INSERT_TWEET = """
+            INSERT INTO tweets (text, user_id, created_at)
+            VALUES (?, ?, ?)
+            RETURNING id
+            """;
 
     public static Tweet save(Tweet newTweet) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(INSERT_TWEET);
@@ -44,8 +44,8 @@ public class TweetRepository {
         statement.setLong(2, UserService.loggedInUser.getId());
         statement.setTimestamp(3, Timestamp.valueOf(newTweet.getCreatedAt()));
 
-        try(ResultSet resultSet = statement.executeQuery()){
-            if (resultSet.next()){
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
                 newTweet.setId(resultSet.getLong("id"));
             }
             statement.close();
@@ -70,17 +70,17 @@ public class TweetRepository {
             SELECT * FROM tweets JOIN users ON tweets.user_id = users.id
             """;
 
-        public static String GET_TAGS_NAMES = """
-                SELECT name FROM tweets_tags JOIN tags ON tweets_tags.tag_id = tags.id
-                WHERE tweets_tags.tweet_id = ?
-                """;
+    public static String GET_TAGS_NAMES = """
+            SELECT name FROM tweets_tags JOIN tags ON tweets_tags.tag_id = tags.id
+            WHERE tweets_tags.tweet_id = ?
+            """;
 
     public static HashSet<String> getTags(long tweetId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(GET_TAGS_NAMES);
         statement.setLong(1, tweetId);
-        try(ResultSet resultSet = statement.executeQuery()){
+        try (ResultSet resultSet = statement.executeQuery()) {
             HashSet<String> tags = new HashSet<>();
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 tags.add(resultSet.getString("name"));
             }
             return tags;
@@ -91,7 +91,7 @@ public class TweetRepository {
         var statement = Datasource.getConnection().prepareStatement(GET_ALL);
         ResultSet resultSet = statement.executeQuery();
         ArrayList<Tweet> tweets = new ArrayList<>();
-        while(resultSet.next()){
+        while (resultSet.next()) {
             Tweet tweet = new Tweet();
             User writer = new User();
             writer.setId(resultSet.getLong("user_id"));
@@ -100,6 +100,8 @@ public class TweetRepository {
             tweet.setId(resultSet.getLong("id"));
             tweet.setText(resultSet.getString("text"));
             tweet.setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime());
+            if (resultSet.getTimestamp("updated_at") != null)
+                tweet.setEditedAt(resultSet.getTimestamp("updated_at").toLocalDateTime());
             tweet.setTags(getTags(tweet.getId()));
             tweets.add(tweet);
         }
@@ -117,7 +119,7 @@ public class TweetRepository {
         statement.setLong(1, user.getId());
         ResultSet resultSet = statement.executeQuery();
         ArrayList<Tweet> tweets = new ArrayList<>();
-        while(resultSet.next()){
+        while (resultSet.next()) {
             Tweet tweet = new Tweet();
             tweet.setWriter(user);
             tweet.setId(resultSet.getLong("id"));

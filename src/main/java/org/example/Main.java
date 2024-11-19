@@ -2,11 +2,13 @@ package org.example;
 
 import org.example.entity.Tweet;
 import org.example.repository.*;
+import org.example.service.ReactionService;
 import org.example.service.TagService;
 import org.example.service.TweetService;
 import org.example.service.UserService;
 
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -72,8 +74,8 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("\n------------- Your Tweets ------------\n");
         int index = 0;
-        for(Tweet tweet: TweetService.getAll(UserService.loggedInUser)){
-            System.out.println(++index + "- " + tweet + "\n");
+        for (Tweet tweet : TweetService.getAll(UserService.loggedInUser)) {
+            System.out.println(++index + "- " + printTweet(tweet) + "\n");
         }
         System.out.print(">>> Enter a tweet's index to view or '0' to go back: ");
         String choice = sc.nextLine();
@@ -86,8 +88,8 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("\n------------- All Tweets ------------\n");
         int index = 0;
-        for(Tweet tweet: TweetService.getAll()){
-            System.out.println(++index + "- " + tweet + "\n");
+        for (Tweet tweet : TweetService.getAll()) {
+            System.out.println(++index + "- " + printTweet(tweet) + "\n");
         }
         System.out.print(">>> Enter a tweet's index to view or '0' to go back: ");
         String choice = sc.nextLine();
@@ -190,5 +192,28 @@ public class Main {
             System.out.println("\n>>> New tweet canceled!");
             homePage();
         }
+    }
+
+    public static String printTweet(Tweet tweet) throws SQLException {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        String stringForm = tweet.getWriter().getDisplayedName() + ": " + tweet.getText() + "\n";
+
+        if (!tweet.getTags().isEmpty()) {
+            stringForm += "   " + tweet.getTags() + ",";
+        }
+
+        stringForm += "   posted at " + tweet.getCreatedAt().format(formatter);
+
+        if (tweet.getEditedAt() != null)
+            stringForm += " (edited)";
+
+        stringForm += "\n" + "   Likes: " + ReactionService.reactionsCount(tweet.getId(),
+                "like") + ",    Dislikes: " + ReactionService.reactionsCount(tweet.getId(),
+                "dislike") + ",    Retweets: " + ReactionService.reactionsCount(tweet.getId(),
+                "retweet");
+
+        return stringForm;
     }
 }
