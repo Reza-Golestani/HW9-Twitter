@@ -66,4 +66,8 @@ public class TweetService {
         TweetRepository.updatedAt(tweet.getId());
         tweet.setEditedAt(LocalDateTime.now());
     }
+
+    public static void setRetweeted(long tweetId, long retweetedId) throws SQLException {
+        TweetRepository.setRetweeted(tweetId, retweetedId);
+    }
 }

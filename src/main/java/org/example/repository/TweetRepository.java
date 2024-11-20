@@ -158,4 +158,16 @@ public class TweetRepository {
         statement.execute();
         statement.close();
     }
+
+    public static String SET_RETWEETED = """
+            UPDATE tweets SET retweeted=? WHERE id=?
+            """;
+
+    public static void setRetweeted(long tweetId, long retweetedId) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(SET_RETWEETED);
+        statement.setLong(1, retweetedId);
+        statement.setLong(2, tweetId);
+        statement.execute();
+        statement.close();
+    }
 }

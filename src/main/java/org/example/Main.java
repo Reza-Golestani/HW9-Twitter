@@ -134,7 +134,7 @@ public class Main {
             System.out.println(">>> Now, you have no reaction to this post!");
             tweetView(tweet);
         } else if (choice.equals("4")) {
-            retweet(UserService.loggedInUser.getId(), tweet.getId());
+            retweet(UserService.loggedInUser.getId(), tweet);
         } else if (UserService.loggedInUser.getId() == tweet.getWriter().getId()) {
             if (choice.equals("5")) {
                 edit(tweet);
@@ -207,8 +207,11 @@ public class Main {
 
     }
 
-    private static void retweet(long userId, long tweetId) {
+    private static void retweet(long userId, Tweet tweet) throws SQLException {
         System.out.println("\n------------ Retweet -------------\n");
+        System.out.println("Note! --> You are about to retweet this tweet:\n");
+        System.out.println(printTweet(tweet));
+        postTweet("retweet", tweet);
     }
 
     private static void editProfileMenu() throws SQLException {
@@ -275,8 +278,12 @@ public class Main {
     }
 
     public static void newTweetMenu() throws SQLException {
-        Scanner sc = new Scanner(System.in);
         System.out.println("\n------------ New Tweet -------------\n");
+        postTweet("new", null);
+    }
+
+    private static void postTweet(String mode, Tweet retweeted) throws SQLException {
+        Scanner sc = new Scanner(System.in);
         System.out.println("Enter your new tweet (Max: 280 characters): ");
         String newTweetText = sc.nextLine();
         while (newTweetText.length() > 280) {
@@ -294,13 +301,25 @@ public class Main {
         String choice = sc.nextLine();
         if (choice.equals("y")) {
             Tweet newTweet = TweetService.create(newTweetText, tagTitles);
-//            TweetRepository.save(newTweet);
             newTweet.setId(TweetRepository.save(newTweet).getId());
             TagService.saveTags(newTweet);
-            System.out.println("\n>>> New tweet posted!");
+            if (mode.equals("new")) {
+                System.out.println("\n>>> New tweet posted!");
+                homePage();
+            } else if (mode.equals("retweet") && retweeted != null) {
+                TweetService.setRetweeted(newTweet.getId(), retweeted.getId());
+                System.out.println("\n>>> Retweet done and new tweet posted!");
+                tweetView(retweeted);
+            }
+
         } else if (choice.equals("n")) {
-            System.out.println("\n>>> New tweet canceled!");
-            homePage();
+            if (mode.equals("new")) {
+                System.out.println("\n>>> New tweet canceled!");
+                homePage();
+            } else if (mode.equals("retweet") && retweeted != null) {
+                System.out.println("\n>>> Retweet canceled!");
+                tweetView(retweeted);
+            }
         }
     }
 
@@ -328,3 +347,6 @@ public class Main {
         return stringForm;
     }
 }
+
+
+
