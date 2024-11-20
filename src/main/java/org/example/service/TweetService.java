@@ -25,7 +25,6 @@ public class TweetService {
 
     public static void deleteTweet(Tweet tweet) throws SQLException {
 
-        TweetRepository.delete(tweet);
         ReactionRepository.deleteByTweet(tweet);
         Tweet_TagRepository.deleteByTweet(tweet);
         if (tweet.getTags() != null) {
@@ -35,6 +34,7 @@ public class TweetService {
                 }
             }
         }
+        TweetRepository.delete(tweet);
     }
 
     public static ArrayList<Tweet> getAll() throws SQLException {
