@@ -88,22 +88,43 @@ public class TweetRepository {
         }
     }
 
+    public static String GET_ONE_BY_ID = """
+            SELECT * FROM tweets JOIN users ON tweets.user_id = users.id
+            WHERE tweets.id = ?
+            """;
+
+    public static Tweet getOne(long tweetId) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(GET_ONE_BY_ID);
+        statement.setLong(1, tweetId);
+        try (ResultSet resultSet = statement.executeQuery()) {
+            Tweet tweet = new Tweet();
+            if (resultSet.next()) {
+                User writer = new User();
+                writer.setId(resultSet.getLong("user_id"));
+                writer.setDisplayedName(resultSet.getString("displayed_name"));
+                tweet.setWriter(writer);
+                tweet.setId(resultSet.getLong("id"));
+                tweet.setText(resultSet.getString("text"));
+                tweet.setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime());
+                if (resultSet.getTimestamp("updated_at") != null) {
+                    tweet.setEditedAt(resultSet.getTimestamp("updated_at").toLocalDateTime());
+                }
+                tweet.setTags(getTags(tweet.getId()));
+                if (resultSet.getLong("retweeted") != 0) {
+                    tweet.setRetweeted(getOne(resultSet.getLong("retweeted")));
+                }
+            }
+            return tweet;
+        }
+    }
+
     public static ArrayList<Tweet> getAllTweets() throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(GET_ALL);
         ResultSet resultSet = statement.executeQuery();
         ArrayList<Tweet> tweets = new ArrayList<>();
         while (resultSet.next()) {
-            Tweet tweet = new Tweet();
-            User writer = new User();
-            writer.setId(resultSet.getLong("user_id"));
-            writer.setDisplayedName(resultSet.getString("displayed_name"));
-            tweet.setWriter(writer);
-            tweet.setId(resultSet.getLong("id"));
-            tweet.setText(resultSet.getString("text"));
-            tweet.setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime());
-            if (resultSet.getTimestamp("updated_at") != null)
-                tweet.setEditedAt(resultSet.getTimestamp("updated_at").toLocalDateTime());
-            tweet.setTags(getTags(tweet.getId()));
+            long tweetId = resultSet.getLong("id");
+            Tweet tweet = getOne(tweetId);
             tweets.add(tweet);
         }
         statement.close();
@@ -121,14 +142,8 @@ public class TweetRepository {
         ResultSet resultSet = statement.executeQuery();
         ArrayList<Tweet> tweets = new ArrayList<>();
         while (resultSet.next()) {
-            Tweet tweet = new Tweet();
-            tweet.setWriter(user);
-            tweet.setId(resultSet.getLong("id"));
-            tweet.setText(resultSet.getString("text"));
-            tweet.setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime());
-            if (resultSet.getTimestamp("updated_at") != null)
-                tweet.setEditedAt(resultSet.getTimestamp("updated_at").toLocalDateTime());
-            tweet.setTags(getTags(tweet.getId()));
+            long tweetId = resultSet.getLong("id");
+            Tweet tweet = getOne(tweetId);
             tweets.add(tweet);
         }
         statement.close();
@@ -148,8 +163,8 @@ public class TweetRepository {
     }
 
     public static String UPDATED_AT = """
-            UPDATE tweets SET updated_at=? WHERE id=?
-           """;
+             UPDATE tweets SET updated_at=? WHERE id=?
+            """;
 
     public static void updatedAt(long tweetId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(UPDATED_AT);

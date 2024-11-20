@@ -75,7 +75,7 @@ public class Main {
         System.out.println("\n------------- Your Tweets ------------\n");
         int index = 0;
         for (Tweet tweet : TweetService.getAll(UserService.loggedInUser)) {
-            System.out.println("\n--< " + ++index + " >--\n" + printTweet(tweet) + "\n");
+            System.out.println("\n--< " + ++index + " >--\n" + printTweet(tweet, 0) + "\n");
         }
         System.out.print("\n>>> Enter a tweet's index to view or '0' to go back: ");
         String choice = sc.nextLine();
@@ -91,7 +91,7 @@ public class Main {
         System.out.println("\n------------- All Tweets ------------\n");
         int index = 0;
         for (Tweet tweet : TweetService.getAll()) {
-            System.out.println("\n<<< " + ++index + " >>>\n" + printTweet(tweet) + "\n");
+            System.out.println("\n<<< " + ++index + " >>>\n" + printTweet(tweet, 0) + "\n");
         }
         System.out.print("\n>>> Enter a tweet's index to view or '0' to go back: ");
         String choice = sc.nextLine();
@@ -104,7 +104,7 @@ public class Main {
 
     private static void tweetView(Tweet tweet) throws SQLException {
         System.out.println("\n------------- Tweet View -------------\n");
-        System.out.println(printTweet(tweet));
+        System.out.println(printTweet(tweet, 0));
         System.out.println("\n-> Note! <-\nYour current reaction to this tweet: " +
                 ReactionService.currentReaction(UserService.loggedInUser.getId(), tweet.getId()));
         String extraOptions = "5- Edit\n6- Delete\n";
@@ -147,7 +147,7 @@ public class Main {
     private static void Delete(Tweet tweet) throws SQLException {
         System.out.println("\n------------ Delete Tweet ------------\n");
         System.out.println("Note! --> You are about to delete this tweet:\n");
-        System.out.println(printTweet(tweet));
+        System.out.println(printTweet(tweet, 0));
         System.out.print("\n>>> Are you sure? (y/n): ");
         Scanner sc = new Scanner(System.in);
         String choice = sc.nextLine();
@@ -163,7 +163,7 @@ public class Main {
     private static void edit(Tweet tweet) throws SQLException {
         System.out.println("\n------------ Edit Tweet ------------\n");
         System.out.println("Note! --> You are about to edit this tweet:\n");
-        System.out.println(printTweet(tweet));
+        System.out.println(printTweet(tweet, 0));
         System.out.print("""
                 What dou you want to edit?
                                \s
@@ -210,7 +210,7 @@ public class Main {
     private static void retweet(long userId, Tweet tweet) throws SQLException {
         System.out.println("\n------------ Retweet -------------\n");
         System.out.println("Note! --> You are about to retweet this tweet:\n");
-        System.out.println(printTweet(tweet));
+        System.out.println(printTweet(tweet, 0));
         postTweet("retweet", tweet);
     }
 
@@ -284,7 +284,7 @@ public class Main {
 
     private static void postTweet(String mode, Tweet retweeted) throws SQLException {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Enter your new tweet (Max: 280 characters): ");
+        System.out.println("\nEnter your new tweet (Max: 280 characters): ");
         String newTweetText = sc.nextLine();
         while (newTweetText.length() > 280) {
             System.out.println("Too long tweet! Max allowed length is 280 characters, try again: ");
@@ -311,7 +311,6 @@ public class Main {
                 System.out.println("\n>>> Retweet done and new tweet posted!");
                 tweetView(retweeted);
             }
-
         } else if (choice.equals("n")) {
             if (mode.equals("new")) {
                 System.out.println("\n>>> New tweet canceled!");
@@ -323,28 +322,46 @@ public class Main {
         }
     }
 
-    public static String printTweet(Tweet tweet) throws SQLException {
+    public static String printTweet(Tweet tweet, int tabs) throws SQLException {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+        int counter = tabs;
+
         String stringForm =
-                tweet.getWriter().getDisplayedName() + ":\n" + tweet.getText() + "\n----------------------------------------\n";
+                printTabs(tabs) + tweet.getWriter().getDisplayedName() + ":\n" + printTabs(tabs) + tweet.getText() +
+                        "\n" + printTabs(tabs) +
+                        "----------------------------------------\n";
 
         if (!tweet.getTags().isEmpty()) {
-            stringForm += tweet.getTags() + "\n";
+            stringForm += printTabs(tabs) + tweet.getTags() + "\n";
         }
 
-        stringForm += "Posted at " + tweet.getCreatedAt().format(formatter);
+        stringForm += printTabs(tabs) + "Posted at " + tweet.getCreatedAt().format(formatter);
 
         if (tweet.getEditedAt() != null)
             stringForm += " (edited)";
 
-        stringForm += "\n" + "Likes: " + ReactionService.reactionsCount(tweet.getId(),
+        stringForm += "\n" + printTabs(tabs) + "Likes: " + ReactionService.reactionsCount(tweet.getId(),
                 "like") + ",    Dislikes: " + ReactionService.reactionsCount(tweet.getId(),
                 "dislike") + ",    Retweets: " + ReactionService.reactionsCount(tweet.getId(),
                 "retweet");
 
+        if (tweet.getRetweeted() != null) {
+            counter++;
+            stringForm += "\n" + printTabs(tabs) + "------> Retweeted:\n" + printTweet(tweet.getRetweeted(), counter);
+        }
+
+
         return stringForm;
+    }
+
+    public static String printTabs(int count) {
+        String tabs = "";
+        for (int i = 0; i < 2 * count; i++) {
+            tabs += "\t";
+        }
+        return tabs;
     }
 }
 
