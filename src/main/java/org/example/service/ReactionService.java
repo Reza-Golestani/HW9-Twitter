@@ -7,18 +7,28 @@ import java.sql.SQLException;
 public class ReactionService {
 
     public static long reactionsCount(long tweetId, String reaction) throws SQLException {
-        long count = 0;
-        switch (reaction) {
-            case "like":
-                count = ReactionRepository.likesCount(tweetId);
-                break;
-            case "dislike":
-                count = ReactionRepository.dislikesCount(tweetId);
-                break;
-            case "retweet":
-                count = ReactionRepository.retweetCount(tweetId);
-                break;
-        }
-        return count;
+        return switch (reaction) {
+            case "like" -> ReactionRepository.likesCount(tweetId);
+            case "dislike" -> ReactionRepository.dislikesCount(tweetId);
+            case "retweet" -> ReactionRepository.retweetCount(tweetId);
+            default -> 0;
+        };
     }
+
+    public static String currentReaction(long userId, long tweetId) throws SQLException {
+        return ReactionRepository.currentReaction(userId, tweetId);
+    }
+
+    public static void like(long userId, long tweetId) throws SQLException {
+        ReactionRepository.like(userId, tweetId);
+    }
+
+    public static void dislike(long userId, long tweetId) throws SQLException {
+        ReactionRepository.dislike(userId, tweetId);
+    }
+
+    public static void clearReaction(long userId, long tweetId) throws SQLException {
+        ReactionRepository.clearReaction(userId, tweetId);
+    }
+
 }

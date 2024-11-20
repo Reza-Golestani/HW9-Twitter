@@ -75,12 +75,14 @@ public class Main {
         System.out.println("\n------------- Your Tweets ------------\n");
         int index = 0;
         for (Tweet tweet : TweetService.getAll(UserService.loggedInUser)) {
-            System.out.println(++index + "- " + printTweet(tweet) + "\n");
+            System.out.println("\n--< " + ++index + " >--\n" + printTweet(tweet) + "\n");
         }
-        System.out.print(">>> Enter a tweet's index to view or '0' to go back: ");
+        System.out.print("\n>>> Enter a tweet's index to view or '0' to go back: ");
         String choice = sc.nextLine();
         if (choice.equals("0")) {
             homePage();
+        } else if (Integer.parseInt(choice) <= TweetService.getAll(UserService.loggedInUser).size()) {
+            tweetView(TweetService.getAll(UserService.loggedInUser).get(Integer.parseInt(choice) - 1));
         }
     }
 
@@ -89,16 +91,81 @@ public class Main {
         System.out.println("\n------------- All Tweets ------------\n");
         int index = 0;
         for (Tweet tweet : TweetService.getAll()) {
-            System.out.println(++index + "- " + printTweet(tweet) + "\n");
+            System.out.println("\n<<< " + ++index + " >>>\n" + printTweet(tweet) + "\n");
         }
-        System.out.print(">>> Enter a tweet's index to view or '0' to go back: ");
+        System.out.print("\n>>> Enter a tweet's index to view or '0' to go back: ");
         String choice = sc.nextLine();
         if (choice.equals("0")) {
             homePage();
+        } else if (Integer.parseInt(choice) <= TweetService.getAll().size()) {
+            tweetView(TweetService.getAll().get(Integer.parseInt(choice) - 1));
         }
-//        else if () {
-//
-//        }
+    }
+
+    private static void tweetView(Tweet tweet) throws SQLException {
+        System.out.println("\n------------- Tweet View -------------\n");
+        System.out.println(printTweet(tweet));
+        System.out.println("\n-> Note! <-\nYour current reaction to this tweet: " +
+                ReactionService.currentReaction(UserService.loggedInUser.getId(), tweet.getId()));
+        String extraOptions = "5- Edit\n6- Delete\n";
+        System.out.println("""
+                \n1- Like
+                2- Dislike
+                3- Clear your reaction
+                4- Retweet""");
+        if (UserService.loggedInUser.getId() == tweet.getWriter().getId())
+            System.out.println(extraOptions);
+        System.out.println("0- Back");
+        System.out.print("\n>>> Enter your choice: ");
+        Scanner sc = new Scanner(System.in);
+        String choice = sc.nextLine();
+        if (choice.equals("0")) {
+            homePage();
+        } else if (choice.equals("1")) {
+            ReactionService.like(UserService.loggedInUser.getId(), tweet.getId());
+            System.out.println(">>> Now, your reaction to this post is: LIKE");
+            tweetView(tweet);
+        } else if (choice.equals("2")) {
+            ReactionService.dislike(UserService.loggedInUser.getId(), tweet.getId());
+            System.out.println(">>> Now, your reaction to this post is: DISLIKE");
+            tweetView(tweet);
+        } else if (choice.equals("3")) {
+            ReactionService.clearReaction(UserService.loggedInUser.getId(), tweet.getId());
+            System.out.println(">>> Now, you have no reaction to this post!");
+            tweetView(tweet);
+        } else if (choice.equals("4")) {
+            retweet(UserService.loggedInUser.getId(), tweet.getId());
+        } else if (UserService.loggedInUser.getId() == tweet.getWriter().getId()) {
+            if (choice.equals("5")) {
+                edit(tweet.getId());
+            } else if (choice.equals("6")) {
+                Delete(tweet);
+            }
+        }
+    }
+
+    private static void Delete(Tweet tweet) throws SQLException {
+        System.out.println("\n------------ Delete ------------\n");
+        System.out.println("Note! --> You are about to delete this tweet:\n");
+        System.out.println(printTweet(tweet));
+        System.out.print("\n>>> Are you sure? (y/n): ");
+        Scanner sc = new Scanner(System.in);
+        String choice = sc.nextLine();
+        if (choice.equals("y")) {
+            TweetService.deleteTweet(tweet);
+            System.out.println("\n>>> Deleted successfully!");
+        } else if (choice.equals("n")) {
+            System.out.println("\n>>> Deleting canceled!");
+            tweetView(tweet);
+        }
+    }
+
+    private static void edit(long tweetId) {
+        System.out.println("\n------------ Edit ------------\n");
+    }
+
+    private static void retweet(long userId, long tweetId) {
+        System.out.println("\n------------ Retweet -------------\n");
     }
 
     private static void editProfileMenu() throws SQLException {
@@ -198,18 +265,19 @@ public class Main {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        String stringForm = tweet.getWriter().getDisplayedName() + ": " + tweet.getText() + "\n";
+        String stringForm =
+                tweet.getWriter().getDisplayedName() + ":\n" + tweet.getText() + "\n----------------------------------------\n";
 
         if (!tweet.getTags().isEmpty()) {
-            stringForm += "   " + tweet.getTags() + ",";
+            stringForm += tweet.getTags() + "\n";
         }
 
-        stringForm += "   posted at " + tweet.getCreatedAt().format(formatter);
+        stringForm += "Posted at " + tweet.getCreatedAt().format(formatter);
 
         if (tweet.getEditedAt() != null)
             stringForm += " (edited)";
 
-        stringForm += "\n" + "   Likes: " + ReactionService.reactionsCount(tweet.getId(),
+        stringForm += "\n" + "Likes: " + ReactionService.reactionsCount(tweet.getId(),
                 "like") + ",    Dislikes: " + ReactionService.reactionsCount(tweet.getId(),
                 "dislike") + ",    Retweets: " + ReactionService.reactionsCount(tweet.getId(),
                 "retweet");
