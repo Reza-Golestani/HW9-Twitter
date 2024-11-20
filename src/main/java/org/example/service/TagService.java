@@ -10,11 +10,13 @@ public class TagService {
 
     public static void saveTags(Tweet tweet) throws SQLException {
         for (String tag : tweet.getTags()){
+            long tagId;
             if(!TagRepository.isTagDuplicate(tag)){
-//                TagRepository.save(tag);
-                long tagId = TagRepository.save(tag).getId();
-                Tweet_TagRepository.save(tweet.getId(), tagId);
+                tagId = TagRepository.save(tag).getId();
+            } else {
+                tagId = TagRepository.getTagId(tag);
             }
+            Tweet_TagRepository.save(tweet.getId(), tagId);
         }
     }
 

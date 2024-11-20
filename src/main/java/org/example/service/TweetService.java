@@ -46,4 +46,24 @@ public class TweetService {
     }
 
 
+    public static void editTags(Tweet tweet, Set<String> newTagTitles) throws SQLException {
+        Tweet_TagRepository.deleteByTweet(tweet);
+        if (tweet.getTags() != null) {
+            for (String tag : tweet.getTags()) {
+                if (Tweet_TagRepository.isTagUseless(tweet.getId(), TagRepository.getTagId(tag))) {
+                    TagRepository.delete(tag);
+                }
+            }
+        }
+        tweet.setTags(newTagTitles);
+        TagService.saveTags(tweet);
+        TweetRepository.updatedAt(tweet.getId());
+        tweet.setEditedAt(LocalDateTime.now());
+    }
+
+    public static void editText(Tweet tweet, String newText) throws SQLException {
+        TweetRepository.editText(tweet.getId(), newText);
+        TweetRepository.updatedAt(tweet.getId());
+        tweet.setEditedAt(LocalDateTime.now());
+    }
 }

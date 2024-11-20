@@ -8,6 +8,7 @@ import org.example.service.UserService;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -125,10 +126,36 @@ public class TweetRepository {
             tweet.setId(resultSet.getLong("id"));
             tweet.setText(resultSet.getString("text"));
             tweet.setCreatedAt(resultSet.getTimestamp("created_at").toLocalDateTime());
+            if (resultSet.getTimestamp("updated_at") != null)
+                tweet.setEditedAt(resultSet.getTimestamp("updated_at").toLocalDateTime());
             tweet.setTags(getTags(tweet.getId()));
             tweets.add(tweet);
         }
         statement.close();
         return tweets;
+    }
+
+    public static String UPDATE_TEXT = """
+            UPDATE tweets SET text=? WHERE id=?
+            """;
+
+    public static void editText(long tweetId, String newText) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(UPDATE_TEXT);
+        statement.setString(1, newText);
+        statement.setLong(2, tweetId);
+        statement.execute();
+        statement.close();
+    }
+
+    public static String UPDATED_AT = """
+            UPDATE tweets SET updated_at=? WHERE id=?
+           """;
+
+    public static void updatedAt(long tweetId) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(UPDATED_AT);
+        statement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+        statement.setLong(2, tweetId);
+        statement.execute();
+        statement.close();
     }
 }

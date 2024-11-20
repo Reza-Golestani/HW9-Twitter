@@ -137,7 +137,7 @@ public class Main {
             retweet(UserService.loggedInUser.getId(), tweet.getId());
         } else if (UserService.loggedInUser.getId() == tweet.getWriter().getId()) {
             if (choice.equals("5")) {
-                edit(tweet.getId());
+                edit(tweet);
             } else if (choice.equals("6")) {
                 Delete(tweet);
             }
@@ -145,7 +145,7 @@ public class Main {
     }
 
     private static void Delete(Tweet tweet) throws SQLException {
-        System.out.println("\n------------ Delete ------------\n");
+        System.out.println("\n------------ Delete Tweet ------------\n");
         System.out.println("Note! --> You are about to delete this tweet:\n");
         System.out.println(printTweet(tweet));
         System.out.print("\n>>> Are you sure? (y/n): ");
@@ -160,8 +160,51 @@ public class Main {
         }
     }
 
-    private static void edit(long tweetId) {
-        System.out.println("\n------------ Edit ------------\n");
+    private static void edit(Tweet tweet) throws SQLException {
+        System.out.println("\n------------ Edit Tweet ------------\n");
+        System.out.println("Note! --> You are about to edit this tweet:\n");
+        System.out.println(printTweet(tweet));
+        System.out.print("""
+                What dou you want to edit?
+                               \s
+                1- Tweet text
+                2- Tweet tags
+                0- Back
+                               \s
+                >>> Enter your choice:""");
+        Scanner sc = new Scanner(System.in);
+        String newText = tweet.getText();
+        Set<String> newTagTitles = tweet.getTags();
+        String choice = sc.nextLine();
+        if (choice.equals("0")) {
+            tweetView(tweet);
+        } else if (choice.equals("1")) {
+            System.out.println("\nEnter your new text (Max: 280 characters): ");
+            newText = sc.nextLine();
+            while (newText.length() > 280) {
+                System.out.println("Too long tweet! Max allowed length is 280 characters, try again: ");
+                newText = sc.nextLine();
+            }
+        } else if (choice.equals("2")) {
+            System.out.println("\nEnter new tags (enter '0' to finish): ");
+            newTagTitles = new HashSet<>();
+            String newTagTitle = sc.nextLine();
+            while (!newTagTitle.equals("0")) {
+                newTagTitles.add(newTagTitle);
+                newTagTitle = sc.nextLine();
+            }
+        }
+        System.out.print("\nApply changes? (y/n): ");
+        String choice2 = sc.nextLine();
+        if (choice2.equals("y")) {
+            TweetService.editText(tweet, newText);
+            TweetService.editTags(tweet, newTagTitles);
+            System.out.println("\n>>> Tweet edited successfully!");
+        } else if (choice2.equals("n")) {
+            System.out.println("\n>>> Editing canceled!");
+            tweetView(tweet);
+        }
+
     }
 
     private static void retweet(long userId, long tweetId) {
