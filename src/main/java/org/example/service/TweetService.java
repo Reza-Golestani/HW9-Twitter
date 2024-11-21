@@ -34,7 +34,12 @@ public class TweetService {
                 }
             }
         }
+        handleDeleteReference(tweet);
         TweetRepository.delete(tweet);
+    }
+
+    private static void handleDeleteReference(Tweet tweet) throws SQLException {
+        TweetRepository.handleDeleteReference(tweet.getId());
     }
 
     public static ArrayList<Tweet> getAll() throws SQLException {

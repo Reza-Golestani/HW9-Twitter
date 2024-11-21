@@ -68,7 +68,7 @@ public class TweetRepository {
     }
 
     public static String GET_ALL = """
-            SELECT * FROM tweets JOIN users ON tweets.user_id = users.id
+            SELECT * FROM tweets JOIN users ON tweets.user_id = users.id ORDER BY tweets.created_at
             """;
 
     public static String GET_TAGS_NAMES = """
@@ -132,7 +132,7 @@ public class TweetRepository {
     }
 
     public static String GET_ALL_YOURS = """
-            SELECT * FROM tweets JOIN users ON tweets.user_id = users.id
+            SELECT * FROM tweets JOIN users ON tweets.user_id = users.id ORDER BY tweets.created_at
             WHERE user_id = ?
             """;
 
@@ -184,5 +184,29 @@ public class TweetRepository {
         statement.setLong(2, tweetId);
         statement.execute();
         statement.close();
+    }
+
+    public static String NOTE_IN_RETWEETS = """
+            UPDATE tweets
+            SET text = text || ' [--> Retweeted a deleted tweet <--]'
+            WHERE retweeted=?;
+            """;
+
+    public static String CLEAR_RETWEETED = """
+            UPDATE tweets
+            SET retweeted = null
+            WHERE retweeted=?;
+            """;
+
+    public static void handleDeleteReference(long referenceId) throws SQLException {
+        var statement = Datasource.getConnection().prepareStatement(NOTE_IN_RETWEETS);
+        statement.setLong(1, referenceId);
+        statement.execute();
+        statement.close();
+
+        var statement2 = Datasource.getConnection().prepareStatement(CLEAR_RETWEETED);
+        statement2.setLong(1, referenceId);
+        statement2.execute();
+        statement2.close();
     }
 }
