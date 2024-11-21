@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.apache.commons.codec.binary.Base64;
 import org.example.entity.User;
 import org.example.repository.UserRepository;
 
@@ -13,6 +14,7 @@ public class UserService {
 
     public static User loggedInUser;
 
+    static Base64 base64 = new Base64();
 
     public static void signUp() throws SQLException {
 
@@ -67,13 +69,13 @@ public class UserService {
         System.out.print("Please enter your password: ");
         String password = sc.nextLine();
         if (userRepository.findByUsername(emailOrUsername) != null) {
-            if (userRepository.findByUsername(emailOrUsername).getPassword().equals(String.valueOf(password.hashCode()))) {
+            if (userRepository.findByUsername(emailOrUsername).getPassword().equals(new String(base64.encode(password.getBytes())))) {
                 loggedInUser = userRepository.findByUsername(emailOrUsername);
                 System.out.println("\n>>> Logged in successfully!");
             }
         }
         if (userRepository.findByEmail(emailOrUsername) != null) {
-            if (userRepository.findByEmail(emailOrUsername).getPassword().equals(String.valueOf(password.hashCode()))) {
+            if (userRepository.findByEmail(emailOrUsername).getPassword().equals(new String(base64.encode(password.getBytes())))) {
                 loggedInUser = userRepository.findByEmail(emailOrUsername);
                 System.out.println("\n>>> Logged in successfully!");
             }

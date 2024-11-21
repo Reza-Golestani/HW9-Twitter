@@ -1,5 +1,7 @@
 package org.example;
 
+import org.apache.commons.codec.EncoderException;
+import org.apache.commons.codec.binary.Base64;
 import org.example.entity.Tweet;
 import org.example.repository.*;
 import org.example.service.ReactionService;
@@ -8,19 +10,24 @@ import org.example.service.TweetService;
 import org.example.service.UserService;
 
 import java.sql.SQLException;
+import java.sql.SQLOutput;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws SQLException, EncoderException {
 
         UserRepository.initTable();
         TagRepository.initTable();
         TweetRepository.initTable();
         Tweet_TagRepository.initTable();
         ReactionRepository.initTable();
+
+        Base64 base64 = new Base64();
+        System.out.println(new String(base64.encode("p1".getBytes())));
+        System.out.println(new String(base64.encode("p2".getBytes())));
 
         while (true) {
             while (UserService.loggedInUser == null) {

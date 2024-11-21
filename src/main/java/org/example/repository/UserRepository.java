@@ -1,5 +1,7 @@
 package org.example.repository;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.net.BCodec;
 import org.example.Datasource;
 import org.example.entity.User;
 
@@ -8,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserRepository {
+
+    Base64 base64 = new Base64();
 
     private static final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS users (
@@ -34,10 +38,11 @@ public class UserRepository {
             """;
 
     public User saveUser(User user) throws SQLException {
+
         var statement = Datasource.getConnection().prepareStatement(INSERT_SQL);
         statement.setString(1, user.getEmail());
         statement.setString(2, user.getUsername());
-        statement.setString(3, String.valueOf(user.getPassword().hashCode()));
+        statement.setString(3, new String(base64.encode(user.getPassword().getBytes())));
         statement.setString(4, user.getDisplayedName());
         statement.setString(5, user.getBio());
         statement.setDate(6, Date.valueOf(user.getCreated()));
