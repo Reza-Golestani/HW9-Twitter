@@ -132,8 +132,9 @@ public class TweetRepository {
     }
 
     public static String GET_ALL_YOURS = """
-            SELECT * FROM tweets JOIN users ON tweets.user_id = users.id ORDER BY tweets.created_at
+            SELECT * FROM tweets JOIN users ON tweets.user_id = users.id
             WHERE user_id = ?
+            ORDER BY tweets.created_at
             """;
 
     public static ArrayList<Tweet> getAllTweets(User user) throws SQLException {

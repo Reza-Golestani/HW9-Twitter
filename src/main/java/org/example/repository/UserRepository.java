@@ -146,31 +146,31 @@ private static String CHECK_USERNAME_AVAILABILITY_SQL = """
 
     public void updateUser(User user) throws SQLException {
         long id = user.getId();
-        String UPDATE_EMAIL = """
-                UPDATE users
-                SET email = ?
-                WHERE id = ?
-                """;
-        String UPDATE_USERNAME = """
-                UPDATE users
-                SET username = ?
-                WHERE id = ?
-                """;
-        String UPDATE_PASSWORD = """
-                UPDATE users
-                SET password = ?
-                WHERE id = ?
-                """;
-        String UPDATE_DISPLAYED_NAME = """
-                UPDATE users
-                SET  displayed_name= ?
-                WHERE id = ?
-                """;
-        String UPDATE_BIO = """
-                UPDATE users
-                SET bio = ?
-                WHERE id = ?
-                """;
+//        String UPDATE_EMAIL = """
+//                UPDATE users
+//                SET email = ?
+//                WHERE id = ?
+//                """;
+//        String UPDATE_USERNAME = """
+//                UPDATE users
+//                SET username = ?
+//                WHERE id = ?
+//                """;
+//        String UPDATE_PASSWORD = """
+//                UPDATE users
+//                SET password = ?
+//                WHERE id = ?
+//                """;
+//        String UPDATE_DISPLAYED_NAME = """
+//                UPDATE users
+//                SET  displayed_name= ?
+//                WHERE id = ?
+//                """;
+//        String UPDATE_BIO = """
+//                UPDATE users
+//                SET bio = ?
+//                WHERE id = ?
+//                """;
         String UPDATE_USER = """
                 UPDATE users
                 SET email = ?,

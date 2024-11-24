@@ -75,4 +75,8 @@ public class TweetService {
     public static void setRetweeted(long tweetId, long retweetedId) throws SQLException {
         TweetRepository.setRetweeted(tweetId, retweetedId);
     }
+
+    public static long save(Tweet newTweet) throws SQLException {
+        return TweetRepository.save(newTweet).getId();
+    }
 }

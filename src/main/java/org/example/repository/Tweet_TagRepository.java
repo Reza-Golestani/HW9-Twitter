@@ -60,10 +60,7 @@ public class Tweet_TagRepository {
         statement.setLong(1, tagId);
         statement.setLong(2, tweetId);
         try(ResultSet resultSet = statement.executeQuery()) {
-            if(resultSet.next()){
-                return false;
-            }
-            return true;
+            return !resultSet.next();
         }
     }
 

@@ -109,7 +109,7 @@ public class ReactionRepository {
             """;
 
     public static String INSERT_DISLIKE = """
-            INSERT INTO  reactions (tweet_id, user_id, reaction_type, created_at) VALUES (?,?,'DISLIKE',?)            """;
+            INSERT INTO  reactions (tweet_id, user_id, reaction_type, created_at) VALUES (?,?,'DISLIKE',?)""";
 
     public static String UPDATE_TO_LIKE = """
             UPDATE reactions SET reaction_type = 'LIKE' WHERE tweet_id = ? AND user_id = ?

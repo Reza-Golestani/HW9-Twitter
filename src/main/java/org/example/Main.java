@@ -1,8 +1,8 @@
 package org.example;
 
 import org.apache.commons.codec.EncoderException;
-import org.apache.commons.codec.binary.Base64;
 import org.example.entity.Tweet;
+import org.example.entity.User;
 import org.example.repository.*;
 import org.example.service.ReactionService;
 import org.example.service.TagService;
@@ -10,7 +10,7 @@ import org.example.service.TweetService;
 import org.example.service.UserService;
 
 import java.sql.SQLException;
-import java.sql.SQLOutput;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -24,10 +24,6 @@ public class Main {
         TweetRepository.initTable();
         Tweet_TagRepository.initTable();
         ReactionRepository.initTable();
-
-        Base64 base64 = new Base64();
-        System.out.println(new String(base64.encode("p1".getBytes())));
-        System.out.println(new String(base64.encode("p2".getBytes())));
 
         while (true) {
             while (UserService.loggedInUser == null) {
@@ -48,9 +44,69 @@ public class Main {
         System.out.print(">>> Enter your choice: ");
         String choice = sc.nextLine();
         if (choice.equals("1")) {
-            UserService.signIn();
+            signIn();
         } else if (choice.equals("2")) {
-            UserService.signUp();
+            signUp();
+        }
+    }
+
+    public static void signUp() throws SQLException {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("\n---------------- Sign Up ----------------\n");
+        User user = new User();
+
+        System.out.print("Please enter your email: ");
+        String email = sc.nextLine();
+        while (!UserService.isEmailAvailable(email)) {
+            System.out.print("This email is already in use. Try another one: ");
+            email = sc.nextLine();
+        }
+        user.setEmail(email);
+
+        System.out.print("Please enter your username: ");
+        String username = sc.nextLine();
+        while (!UserService.isUsernameAvailable(username)) {
+            System.out.print("This username is already in use. Try another one: ");
+            username = sc.nextLine();
+        }
+        user.setUsername(username);
+
+        System.out.print("Please enter your password: ");
+        String password = sc.nextLine();
+        user.setPassword(password);
+
+        System.out.print("please enter your displayed name: ");
+        String displayedName = sc.nextLine();
+        user.setDisplayedName(displayedName);
+
+        System.out.println("please enter your bio: ");
+        String bio = sc.nextLine();
+        user.setBio(bio);
+
+        user.setCreated(LocalDate.now());
+
+        UserService.signUp(user);
+
+        System.out.println("\n>>> User successfully signed up!");
+    }
+
+    public static void signIn() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("\n-------------- Sign In ----------------\n");
+        System.out.print("Please enter your email/username: ");
+        String emailOrUsername = sc.nextLine();
+        System.out.print("Please enter your password: ");
+        String password = sc.nextLine();
+        if (UserService.signIn(emailOrUsername, password)) {
+            System.out.println("\n>>> Logged in successfully!");
+        }
+        ;
+
+        if (UserService.loggedInUser == null) {
+            System.out.println("\n>>> Invalid email/username or password!");
         }
     }
 
@@ -74,6 +130,7 @@ public class Main {
             editProfileMenu();
         } else if (choice.equals("0")) {
             UserService.signOut();
+            System.out.println("\nYou have been logged out successfully!");
         }
     }
 
@@ -161,6 +218,7 @@ public class Main {
         if (choice.equals("y")) {
             TweetService.deleteTweet(tweet);
             System.out.println("\n>>> Deleted successfully!");
+            yourTweetsMenu();
         } else if (choice.equals("n")) {
             System.out.println("\n>>> Deleting canceled!");
             tweetView(tweet);
@@ -224,7 +282,6 @@ public class Main {
     private static void editProfileMenu() throws SQLException {
 
         // todo: show the current values to user while asking for new ones
-        UserRepository userRepository = new UserRepository();
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\n------------ Edit Profile -----------\n");
@@ -239,7 +296,7 @@ public class Main {
         if (choice.equals("1")) {
             System.out.print("Enter your new email: ");
             String newEmail = sc.nextLine();
-            while (!userRepository.isEmailAvailable(newEmail)) {
+            while (!UserService.isEmailAvailable(newEmail)) {
                 System.out.print("This email is already in use. Try another one: ");
                 newEmail = sc.nextLine();
             }
@@ -249,7 +306,7 @@ public class Main {
         } else if (choice.equals("2")) {
             System.out.print("Enter your new username: ");
             String newUsername = sc.nextLine();
-            while (!userRepository.isUsernameAvailable(newUsername)) {
+            while (!UserService.isUsernameAvailable(newUsername)) {
                 System.out.print("This username is already in use. Try another one: ");
                 newUsername = sc.nextLine();
             }
@@ -308,7 +365,7 @@ public class Main {
         String choice = sc.nextLine();
         if (choice.equals("y")) {
             Tweet newTweet = TweetService.create(newTweetText, tagTitles);
-            newTweet.setId(TweetRepository.save(newTweet).getId());
+            newTweet.setId(TweetService.save(newTweet));
             TagService.saveTags(newTweet);
             if (mode.equals("new")) {
                 System.out.println("\n>>> New tweet posted!");

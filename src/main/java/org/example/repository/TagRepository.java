@@ -2,12 +2,10 @@ package org.example.repository;
 
 import org.example.Datasource;
 import org.example.entity.Tag;
-import org.example.entity.Tweet;
-import org.example.service.UserService;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 public class TagRepository {
 
@@ -75,13 +73,13 @@ public class TagRepository {
     }
 
     public static String DELETE_BY_NAME = """
-                DELETE FROM tags
-                WHERE name = ?
-                """;
+            DELETE FROM tags
+            WHERE name = ?
+            """;
 
-    public static void delete(String tag) throws SQLException {
-        var statement = Datasource.getConnection().prepareStatement(DELETE_BY_NAME);
-        statement.setString(1, tag);
+    public static void delete(String tagName) throws SQLException {
+        PreparedStatement statement = Datasource.getConnection().prepareStatement(DELETE_BY_NAME);
+        statement.setString(1,tagName);
         statement.execute();
         statement.close();
     }
