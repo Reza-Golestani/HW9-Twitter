@@ -1,13 +1,12 @@
-package org.example.repository;
+package org.example.repository.impl;
 
 import org.example.Datasource;
-import org.example.entity.Tag;
 import org.example.entity.Tweet;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Tweet_TagRepository {
+public class Tweet_TagRepositoryImpl {
 
     private static final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS tweets_tags (
