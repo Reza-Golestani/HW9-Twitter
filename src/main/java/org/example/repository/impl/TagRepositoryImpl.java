@@ -17,6 +17,7 @@ public class TagRepositoryImpl implements TagRepository {
             );
             """;
 
+    @Override
     public void initTable() throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(CREATE_TABLE);
         statement.execute();
@@ -29,6 +30,7 @@ public class TagRepositoryImpl implements TagRepository {
                 RETURNING id
                 """;
 
+    @Override
     public Tag save(String newTagTitle) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(INSERT_TAG);
         statement.setString(1, newTagTitle);
@@ -48,6 +50,7 @@ public class TagRepositoryImpl implements TagRepository {
             WHERE name = ?
             """;
 
+    @Override
     public boolean isTagDuplicate(String name) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(FIND_TAG);
         statement.setString(1, name);
@@ -61,6 +64,7 @@ public class TagRepositoryImpl implements TagRepository {
         }
     }
 
+    @Override
     public long getTagId(String name) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(FIND_TAG);
         statement.setString(1, name);
@@ -78,6 +82,7 @@ public class TagRepositoryImpl implements TagRepository {
             WHERE name = ?
             """;
 
+    @Override
     public void delete(String tagName) throws SQLException {
         PreparedStatement statement = Datasource.getConnection().prepareStatement(DELETE_BY_NAME);
         statement.setString(1,tagName);

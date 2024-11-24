@@ -9,24 +9,28 @@ import java.sql.SQLException;
 
 public class UserServiceImpl implements UserService {
 
-    private UserRepositoryImpl userRepository = new UserRepositoryImpl();
+    private final UserRepositoryImpl userRepository = new UserRepositoryImpl();
 
     public static User loggedInUser;
 
-    private Base64 base64 = new Base64();
+    private final Base64 base64 = new Base64();
 
+    @Override
     public boolean isEmailAvailable(String email) throws SQLException {
         return userRepository.isEmailAvailable(email);
     }
 
+    @Override
     public boolean isUsernameAvailable(String username) throws SQLException {
         return userRepository.isUsernameAvailable(username);
     }
 
+    @Override
     public void signUp(User user) throws SQLException {
         userRepository.saveUser(user);
     }
 
+    @Override
     public boolean signIn(String emailOrUsername, String password) throws SQLException {
         if (userRepository.findByUsername(emailOrUsername) != null) {
             if (userRepository.findByUsername(emailOrUsername).getPassword().equals(new String(base64.encode(password.getBytes())))) {
@@ -43,10 +47,12 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    @Override
     public void signOut() {
         loggedInUser = null;
     }
 
+    @Override
     public void updateUser(User user) throws SQLException {
         userRepository.updateUser(user);
     }

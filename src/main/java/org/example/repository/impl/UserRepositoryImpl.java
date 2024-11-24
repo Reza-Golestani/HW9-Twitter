@@ -25,6 +25,7 @@ public class UserRepositoryImpl implements UserRepository {
             );
             """;
 
+    @Override
     public void initTable() throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(CREATE_TABLE);
         statement.execute();
@@ -37,7 +38,8 @@ public class UserRepositoryImpl implements UserRepository {
             RETURNING id;
             """;
 
-    public User saveUser(User user) throws SQLException {
+    @Override
+    public void saveUser(User user) throws SQLException {
 
         var statement = Datasource.getConnection().prepareStatement(INSERT_SQL);
         statement.setString(1, user.getEmail());
@@ -52,7 +54,6 @@ public class UserRepositoryImpl implements UserRepository {
                 user.setId(resultSet.getLong(1));
             }
             statement.close();
-            return user;
         }
     }
 
@@ -66,6 +67,7 @@ public class UserRepositoryImpl implements UserRepository {
             WHERE username = ?
             """;
 
+    @Override
     public boolean isEmailAvailable(String email) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(CHECK_EMAIL_AVAILABILITY_SQL);
         statement.setString(1, email);
@@ -79,6 +81,7 @@ public class UserRepositoryImpl implements UserRepository {
         return true;
     }
 
+    @Override
     public boolean isUsernameAvailable(String username) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(CHECK_USERNAME_AVAILABILITY_SQL);
         statement.setString(1, username);
@@ -102,6 +105,7 @@ public class UserRepositoryImpl implements UserRepository {
             WHERE email = ?
             """;
 
+    @Override
     public User findByEmail(String email) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(FIND_BY_EMAIL);
         statement.setString(1, email);
@@ -123,6 +127,7 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
+    @Override
     public User findByUsername(String username) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(FIND_BY_USERNAME);
         statement.setString(1, username);
@@ -144,6 +149,7 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
+    @Override
     public void updateUser(User user) throws SQLException {
         long id = user.getId();
 //        String UPDATE_EMAIL = """

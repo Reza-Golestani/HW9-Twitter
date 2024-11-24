@@ -19,6 +19,7 @@ public class Tweet_TagRepositoryImpl implements Twee_TagRepository {
             );
             """;
 
+    @Override
     public void initTable() throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(CREATE_TABLE);
         statement.execute();
@@ -30,6 +31,7 @@ public class Tweet_TagRepositoryImpl implements Twee_TagRepository {
             VALUES (? , ?)
             """;
 
+    @Override
     public void save(long TweetId, long tagId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(INSERT_TWEET_TAG);
         statement.setLong(1, TweetId);
@@ -43,6 +45,7 @@ public class Tweet_TagRepositoryImpl implements Twee_TagRepository {
             WHERE tweet_id = ?
             """;
 
+    @Override
     public void deleteByTweet(Tweet tweet) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(DELETE_BY_TWEET_ID);
         statement.setLong(1, tweet.getId());
@@ -55,6 +58,7 @@ public class Tweet_TagRepositoryImpl implements Twee_TagRepository {
             WHERE tag_id = ? and tweet_id <> ?
             """;
 
+    @Override
     public boolean isTagUseless(long tweetId, long tagId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(IS_TAG_USELESS);
         statement.setLong(1, tagId);

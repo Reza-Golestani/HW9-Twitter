@@ -9,9 +9,10 @@ import java.sql.SQLException;
 
 public class TagServiceImpl implements TagService {
 
-    private TagRepositoryImpl tagRepositoryImpl = new TagRepositoryImpl();
-    private Tweet_TagRepositoryImpl tweet_tagRepositoryImpl = new Tweet_TagRepositoryImpl();
+    private final TagRepositoryImpl tagRepositoryImpl = new TagRepositoryImpl();
+    private final Tweet_TagRepositoryImpl tweet_tagRepositoryImpl = new Tweet_TagRepositoryImpl();
 
+    @Override
     public void saveTags(Tweet tweet) throws SQLException {
         for (String tag : tweet.getTags()) {
             long tagId;

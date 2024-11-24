@@ -28,6 +28,7 @@ public class TweetRepositoryImpl implements TweetRepository {
             );
             """;
 
+    @Override
     public void initTable() throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(CREATE_TABLE);
         statement.execute();
@@ -40,6 +41,7 @@ public class TweetRepositoryImpl implements TweetRepository {
             RETURNING id
             """;
 
+    @Override
     public Tweet save(Tweet newTweet) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(INSERT_TWEET);
         statement.setString(1, newTweet.getText());
@@ -60,6 +62,7 @@ public class TweetRepositoryImpl implements TweetRepository {
             WHERE id = ?
             """;
 
+    @Override
     public void delete(Tweet tweet) throws SQLException {
         long id = tweet.getId();
         var statement = Datasource.getConnection().prepareStatement(DELETE_TWEET_BY_ID);
@@ -77,6 +80,7 @@ public class TweetRepositoryImpl implements TweetRepository {
             WHERE tweets_tags.tweet_id = ?
             """;
 
+    @Override
     public HashSet<String> getTags(long tweetId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(GET_TAGS_NAMES);
         statement.setLong(1, tweetId);
@@ -94,6 +98,7 @@ public class TweetRepositoryImpl implements TweetRepository {
             WHERE tweets.id = ?
             """;
 
+    @Override
     public Tweet getOne(long tweetId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(GET_ONE_BY_ID);
         statement.setLong(1, tweetId);
@@ -119,6 +124,7 @@ public class TweetRepositoryImpl implements TweetRepository {
         }
     }
 
+    @Override
     public ArrayList<Tweet> getAllTweets() throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(GET_ALL);
         ResultSet resultSet = statement.executeQuery();
@@ -138,6 +144,7 @@ public class TweetRepositoryImpl implements TweetRepository {
             ORDER BY tweets.created_at
             """;
 
+    @Override
     public ArrayList<Tweet> getAllTweets(User user) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(GET_ALL_YOURS);
         statement.setLong(1, user.getId());
@@ -156,6 +163,7 @@ public class TweetRepositoryImpl implements TweetRepository {
             UPDATE tweets SET text=? WHERE id=?
             """;
 
+    @Override
     public void editText(long tweetId, String newText) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(UPDATE_TEXT);
         statement.setString(1, newText);
@@ -168,6 +176,7 @@ public class TweetRepositoryImpl implements TweetRepository {
              UPDATE tweets SET updated_at=? WHERE id=?
             """;
 
+    @Override
     public void updatedAt(long tweetId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(UPDATED_AT);
         statement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
@@ -180,6 +189,7 @@ public class TweetRepositoryImpl implements TweetRepository {
             UPDATE tweets SET retweeted=? WHERE id=?
             """;
 
+    @Override
     public void setRetweeted(long tweetId, long retweetedId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(SET_RETWEETED);
         statement.setLong(1, retweetedId);
@@ -200,6 +210,7 @@ public class TweetRepositoryImpl implements TweetRepository {
             WHERE retweeted=?;
             """;
 
+    @Override
     public void handleDeleteReference(long referenceId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(NOTE_IN_RETWEETS);
         statement.setLong(1, referenceId);

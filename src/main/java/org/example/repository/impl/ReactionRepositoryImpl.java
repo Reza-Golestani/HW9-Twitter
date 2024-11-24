@@ -23,6 +23,7 @@ public class ReactionRepositoryImpl implements ReactionRepository {
             );
             """;
 
+    @Override
     public void initTable() throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(CREATE_TABLE);
         statement.execute();
@@ -31,6 +32,7 @@ public class ReactionRepositoryImpl implements ReactionRepository {
 
     private final String DELETE_BY_TWEET_ID = "DELETE FROM reactions WHERE tweet_id = ?";
 
+    @Override
     public void deleteByTweet(Tweet tweet) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(DELETE_BY_TWEET_ID);
         statement.setLong(1, tweet.getId());
@@ -53,6 +55,7 @@ public class ReactionRepositoryImpl implements ReactionRepository {
             WHERE retweeted =?
             """;
 
+    @Override
     public long likesCount(long tweetId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(LIKES_COUNT);
         statement.setLong(1, tweetId);
@@ -64,6 +67,7 @@ public class ReactionRepositoryImpl implements ReactionRepository {
         return 0;
     }
 
+    @Override
     public long dislikesCount(long tweetId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(DISLIKES_COUNT);
         statement.setLong(1, tweetId);
@@ -75,6 +79,7 @@ public class ReactionRepositoryImpl implements ReactionRepository {
         return 0;
     }
 
+    @Override
     public long retweetCount(long tweetId) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(RETWEETS_COUNT);
         statement.setLong(1, tweetId);
@@ -92,6 +97,7 @@ public class ReactionRepositoryImpl implements ReactionRepository {
                 """;
 
 
+    @Override
     public String currentReaction(long userId, long tweetId) throws SQLException {
 
         var statement = Datasource.getConnection().prepareStatement(FIND_REACTION);
@@ -124,6 +130,7 @@ public class ReactionRepositoryImpl implements ReactionRepository {
             DELETE FROM reactions WHERE tweet_id = ? AND user_id = ?
             """;
 
+    @Override
     public void like(long userId, long tweetId) throws SQLException {
 
         var findStatement = Datasource.getConnection().prepareStatement(FIND_REACTION);
@@ -147,6 +154,7 @@ public class ReactionRepositoryImpl implements ReactionRepository {
         }
     }
 
+    @Override
     public void dislike(long userId, long tweetId) throws SQLException {
 
         var findStatement = Datasource.getConnection().prepareStatement(FIND_REACTION);
@@ -171,6 +179,7 @@ public class ReactionRepositoryImpl implements ReactionRepository {
         }
     }
 
+    @Override
     public void clearReaction(long userId, long tweetId) throws SQLException {
         var findStatement = Datasource.getConnection().prepareStatement(FIND_REACTION);
         findStatement.setLong(1, userId);
