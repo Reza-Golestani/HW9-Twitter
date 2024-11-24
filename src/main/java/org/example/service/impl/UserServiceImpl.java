@@ -3,30 +3,31 @@ package org.example.service.impl;
 import org.apache.commons.codec.binary.Base64;
 import org.example.entity.User;
 import org.example.repository.impl.UserRepositoryImpl;
+import org.example.service.UserService;
 
 import java.sql.SQLException;
 
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService {
 
-    static UserRepositoryImpl userRepository = new UserRepositoryImpl();
+    private UserRepositoryImpl userRepository = new UserRepositoryImpl();
 
     public static User loggedInUser;
 
-    static Base64 base64 = new Base64();
+    private Base64 base64 = new Base64();
 
-    public static boolean isEmailAvailable(String email) throws SQLException {
+    public boolean isEmailAvailable(String email) throws SQLException {
         return userRepository.isEmailAvailable(email);
     }
 
-    public static boolean isUsernameAvailable(String username) throws SQLException {
+    public boolean isUsernameAvailable(String username) throws SQLException {
         return userRepository.isUsernameAvailable(username);
     }
 
-    public static void signUp(User user) throws SQLException {
+    public void signUp(User user) throws SQLException {
         userRepository.saveUser(user);
     }
 
-    public static boolean signIn(String emailOrUsername, String password) throws SQLException {
+    public boolean signIn(String emailOrUsername, String password) throws SQLException {
         if (userRepository.findByUsername(emailOrUsername) != null) {
             if (userRepository.findByUsername(emailOrUsername).getPassword().equals(new String(base64.encode(password.getBytes())))) {
                 loggedInUser = userRepository.findByUsername(emailOrUsername);
@@ -42,11 +43,11 @@ public class UserServiceImpl {
         return false;
     }
 
-    public static void signOut() {
+    public void signOut() {
         loggedInUser = null;
     }
 
-    public static void updateUser(User user) throws SQLException {
+    public void updateUser(User user) throws SQLException {
         userRepository.updateUser(user);
     }
 }

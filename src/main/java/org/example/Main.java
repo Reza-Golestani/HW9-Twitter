@@ -17,13 +17,15 @@ import java.util.Scanner;
 import java.util.Set;
 
 public class Main {
+
+    private static final UserServiceImpl userServiceImpl = new UserServiceImpl();
+    private static final ReactionServiceImpl reactionServiceImpl = new ReactionServiceImpl();
+    private static final TagServiceImpl tagServiceImpl = new TagServiceImpl();
+    private static final TweetServiceImpl tweetServiceImpl = new TweetServiceImpl();
+
     public static void main(String[] args) throws SQLException, EncoderException {
 
-        UserRepositoryImpl.initTable();
-        TagRepositoryImpl.initTable();
-        TweetRepositoryImpl.initTable();
-        Tweet_TagRepositoryImpl.initTable();
-        ReactionRepositoryImpl.initTable();
+        initTables();
 
         while (true) {
             while (UserServiceImpl.loggedInUser == null) {
@@ -34,6 +36,20 @@ public class Main {
                 homePage();
             }
         }
+    }
+
+    public static void initTables() throws SQLException {
+        UserRepositoryImpl userRepositoryImpl = new UserRepositoryImpl();
+        TagRepositoryImpl tagRepositoryImpl = new TagRepositoryImpl();
+        TweetRepositoryImpl tweetRepositoryImpl = new TweetRepositoryImpl();
+        Tweet_TagRepositoryImpl tweet_tagRepositoryImpl = new Tweet_TagRepositoryImpl();
+        ReactionRepositoryImpl reactionRepositoryImpl = new ReactionRepositoryImpl();
+
+        userRepositoryImpl.initTable();
+        tagRepositoryImpl.initTable();
+        tweetRepositoryImpl.initTable();
+        tweet_tagRepositoryImpl.initTable();
+        reactionRepositoryImpl.initTable();
     }
 
     private static void welcomePage() throws SQLException {
@@ -59,7 +75,7 @@ public class Main {
 
         System.out.print("Please enter your email: ");
         String email = sc.nextLine();
-        while (!UserServiceImpl.isEmailAvailable(email)) {
+        while (!userServiceImpl.isEmailAvailable(email)) {
             System.out.print("This email is already in use. Try another one: ");
             email = sc.nextLine();
         }
@@ -67,7 +83,7 @@ public class Main {
 
         System.out.print("Please enter your username: ");
         String username = sc.nextLine();
-        while (!UserServiceImpl.isUsernameAvailable(username)) {
+        while (!userServiceImpl.isUsernameAvailable(username)) {
             System.out.print("This username is already in use. Try another one: ");
             username = sc.nextLine();
         }
@@ -87,7 +103,7 @@ public class Main {
 
         user.setCreated(LocalDate.now());
 
-        UserServiceImpl.signUp(user);
+        userServiceImpl.signUp(user);
 
         System.out.println("\n>>> User successfully signed up!");
     }
@@ -100,7 +116,7 @@ public class Main {
         String emailOrUsername = sc.nextLine();
         System.out.print("Please enter your password: ");
         String password = sc.nextLine();
-        if (UserServiceImpl.signIn(emailOrUsername, password)) {
+        if (userServiceImpl.signIn(emailOrUsername, password)) {
             System.out.println("\n>>> Logged in successfully!");
         }
         ;
@@ -129,7 +145,7 @@ public class Main {
         } else if (choice.equals("4")) {
             editProfileMenu();
         } else if (choice.equals("0")) {
-            UserServiceImpl.signOut();
+            userServiceImpl.signOut();
             System.out.println("\nYou have been logged out successfully!");
         }
     }
@@ -138,15 +154,15 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("\n------------- Your Tweets ------------\n");
         int index = 0;
-        for (Tweet tweet : TweetServiceImpl.getAll(UserServiceImpl.loggedInUser)) {
+        for (Tweet tweet : tweetServiceImpl.getAll(UserServiceImpl.loggedInUser)) {
             System.out.println("\n--< " + ++index + " >--\n" + printTweet(tweet, 0) + "\n");
         }
         System.out.print("\n>>> Enter a tweet's index to view or '0' to go back: ");
         String choice = sc.nextLine();
         if (choice.equals("0")) {
             homePage();
-        } else if (Integer.parseInt(choice) <= TweetServiceImpl.getAll(UserServiceImpl.loggedInUser).size()) {
-            tweetView(TweetServiceImpl.getAll(UserServiceImpl.loggedInUser).get(Integer.parseInt(choice) - 1));
+        } else if (Integer.parseInt(choice) <= tweetServiceImpl.getAll(UserServiceImpl.loggedInUser).size()) {
+            tweetView(tweetServiceImpl.getAll(UserServiceImpl.loggedInUser).get(Integer.parseInt(choice) - 1));
         }
     }
 
@@ -154,15 +170,15 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("\n------------- All Tweets ------------\n");
         int index = 0;
-        for (Tweet tweet : TweetServiceImpl.getAll()) {
+        for (Tweet tweet : tweetServiceImpl.getAll()) {
             System.out.println("\n<<< " + ++index + " >>>\n" + printTweet(tweet, 0) + "\n");
         }
         System.out.print("\n>>> Enter a tweet's index to view or '0' to go back: ");
         String choice = sc.nextLine();
         if (choice.equals("0")) {
             homePage();
-        } else if (Integer.parseInt(choice) <= TweetServiceImpl.getAll().size()) {
-            tweetView(TweetServiceImpl.getAll().get(Integer.parseInt(choice) - 1));
+        } else if (Integer.parseInt(choice) <= tweetServiceImpl.getAll().size()) {
+            tweetView(tweetServiceImpl.getAll().get(Integer.parseInt(choice) - 1));
         }
     }
 
@@ -170,7 +186,8 @@ public class Main {
         System.out.println("\n------------- Tweet View -------------\n");
         System.out.println(printTweet(tweet, 0));
         System.out.println("\n-> Note! <-\nYour current reaction to this tweet: " +
-                ReactionServiceImpl.currentReaction(UserServiceImpl.loggedInUser.getId(), tweet.getId()));
+                reactionServiceImpl.currentReaction(UserServiceImpl.loggedInUser.getId(),
+                        tweet.getId()));
         String extraOptions = "5- Edit\n6- Delete\n";
         System.out.println("""
                 \n1- Like
@@ -186,15 +203,15 @@ public class Main {
         if (choice.equals("0")) {
             homePage();
         } else if (choice.equals("1")) {
-            ReactionServiceImpl.like(UserServiceImpl.loggedInUser.getId(), tweet.getId());
+            reactionServiceImpl.like(UserServiceImpl.loggedInUser.getId(), tweet.getId());
             System.out.println(">>> Now, your reaction to this post is: LIKE");
             tweetView(tweet);
         } else if (choice.equals("2")) {
-            ReactionServiceImpl.dislike(UserServiceImpl.loggedInUser.getId(), tweet.getId());
+            reactionServiceImpl.dislike(UserServiceImpl.loggedInUser.getId(), tweet.getId());
             System.out.println(">>> Now, your reaction to this post is: DISLIKE");
             tweetView(tweet);
         } else if (choice.equals("3")) {
-            ReactionServiceImpl.clearReaction(UserServiceImpl.loggedInUser.getId(), tweet.getId());
+            reactionServiceImpl.clearReaction(UserServiceImpl.loggedInUser.getId(), tweet.getId());
             System.out.println(">>> Now, you have no reaction to this post!");
             tweetView(tweet);
         } else if (choice.equals("4")) {
@@ -216,7 +233,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         String choice = sc.nextLine();
         if (choice.equals("y")) {
-            TweetServiceImpl.deleteTweet(tweet);
+            tweetServiceImpl.deleteTweet(tweet);
             System.out.println("\n>>> Deleted successfully!");
             yourTweetsMenu();
         } else if (choice.equals("n")) {
@@ -262,8 +279,8 @@ public class Main {
         System.out.print("\nApply changes? (y/n): ");
         String choice2 = sc.nextLine();
         if (choice2.equals("y")) {
-            TweetServiceImpl.editText(tweet, newText);
-            TweetServiceImpl.editTags(tweet, newTagTitles);
+            tweetServiceImpl.editText(tweet, newText);
+            tweetServiceImpl.editTags(tweet, newTagTitles);
             System.out.println("\n>>> Tweet edited successfully!");
         } else if (choice2.equals("n")) {
             System.out.println("\n>>> Editing canceled!");
@@ -296,22 +313,22 @@ public class Main {
         if (choice.equals("1")) {
             System.out.print("Enter your new email: ");
             String newEmail = sc.nextLine();
-            while (!UserServiceImpl.isEmailAvailable(newEmail)) {
+            while (!userServiceImpl.isEmailAvailable(newEmail)) {
                 System.out.print("This email is already in use. Try another one: ");
                 newEmail = sc.nextLine();
             }
             UserServiceImpl.loggedInUser.setEmail(newEmail);
-            UserServiceImpl.updateUser(UserServiceImpl.loggedInUser);
+            userServiceImpl.updateUser(UserServiceImpl.loggedInUser);
             System.out.println("\n>>> Email successfully updated!");
         } else if (choice.equals("2")) {
             System.out.print("Enter your new username: ");
             String newUsername = sc.nextLine();
-            while (!UserServiceImpl.isUsernameAvailable(newUsername)) {
+            while (!userServiceImpl.isUsernameAvailable(newUsername)) {
                 System.out.print("This username is already in use. Try another one: ");
                 newUsername = sc.nextLine();
             }
             UserServiceImpl.loggedInUser.setUsername(newUsername);
-            UserServiceImpl.updateUser(UserServiceImpl.loggedInUser);
+            userServiceImpl.updateUser(UserServiceImpl.loggedInUser);
         } else if (choice.equals("3")) {
             System.out.print("Enter your old password: ");
             String oldPassword = sc.nextLine();
@@ -322,19 +339,19 @@ public class Main {
             System.out.print("Enter your new password: ");
             String newPassword = sc.nextLine();
             UserServiceImpl.loggedInUser.setPassword(newPassword);
-            UserServiceImpl.updateUser(UserServiceImpl.loggedInUser);
+            userServiceImpl.updateUser(UserServiceImpl.loggedInUser);
             System.out.println("\n>>> Password successfully updated!");
         } else if (choice.equals("4")) {
             System.out.print("Enter your new displayed name: ");
             String newDisplayedName = sc.nextLine();
             UserServiceImpl.loggedInUser.setDisplayedName(newDisplayedName);
-            UserServiceImpl.updateUser(UserServiceImpl.loggedInUser);
+            userServiceImpl.updateUser(UserServiceImpl.loggedInUser);
             System.out.println("\n>>> Displayed name successfully updated!");
         } else if (choice.equals("5")) {
             System.out.println("Enter your new bio: ");
             String newBio = sc.nextLine();
             UserServiceImpl.loggedInUser.setBio(newBio);
-            UserServiceImpl.updateUser(UserServiceImpl.loggedInUser);
+            userServiceImpl.updateUser(UserServiceImpl.loggedInUser);
             System.out.println("\n>>> Bio successfully updated!");
         } else if (choice.equals("0")) {
             homePage();
@@ -364,14 +381,14 @@ public class Main {
         System.out.print("\nPost this new tweet? (y/n): ");
         String choice = sc.nextLine();
         if (choice.equals("y")) {
-            Tweet newTweet = TweetServiceImpl.create(newTweetText, tagTitles);
-            newTweet.setId(TweetServiceImpl.save(newTweet));
-            TagServiceImpl.saveTags(newTweet);
+            Tweet newTweet = tweetServiceImpl.create(newTweetText, tagTitles);
+            newTweet.setId(tweetServiceImpl.save(newTweet));
+            tagServiceImpl.saveTags(newTweet);
             if (mode.equals("new")) {
                 System.out.println("\n>>> New tweet posted!");
                 homePage();
             } else if (mode.equals("retweet") && retweeted != null) {
-                TweetServiceImpl.setRetweeted(newTweet.getId(), retweeted.getId());
+                tweetServiceImpl.setRetweeted(newTweet.getId(), retweeted.getId());
                 System.out.println("\n>>> Retweet done and new tweet posted!");
                 tweetView(retweeted);
             }
@@ -406,16 +423,15 @@ public class Main {
         if (tweet.getEditedAt() != null)
             stringForm += " (edited)";
 
-        stringForm += "\n" + printTabs(tabs) + "Likes: " + ReactionServiceImpl.reactionsCount(tweet.getId(),
-                "like") + ",    Dislikes: " + ReactionServiceImpl.reactionsCount(tweet.getId(),
-                "dislike") + ",    Retweets: " + ReactionServiceImpl.reactionsCount(tweet.getId(),
+        stringForm += "\n" + printTabs(tabs) + "Likes: " + reactionServiceImpl.reactionsCount(tweet.getId(),
+                "like") + ",    Dislikes: " + reactionServiceImpl.reactionsCount(tweet.getId(),
+                "dislike") + ",    Retweets: " + reactionServiceImpl.reactionsCount(tweet.getId(),
                 "retweet");
 
         if (tweet.getRetweeted() != null) {
             counter++;
             stringForm += "\n" + printTabs(tabs) + "------> Retweeted:\n" + printTweet(tweet.getRetweeted(), counter);
         }
-
 
         return stringForm;
     }

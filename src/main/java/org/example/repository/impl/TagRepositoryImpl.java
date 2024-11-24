@@ -2,33 +2,34 @@ package org.example.repository.impl;
 
 import org.example.Datasource;
 import org.example.entity.Tag;
+import org.example.repository.TagRepository;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class TagRepositoryImpl {
+public class TagRepositoryImpl implements TagRepository {
 
-    private static final String CREATE_TABLE = """
+    private final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS tags (
             id bigserial PRIMARY KEY NOT NULL,
             name varchar(50) UNIQUE NOT NULL
             );
             """;
 
-    public static void initTable() throws SQLException {
+    public void initTable() throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(CREATE_TABLE);
         statement.execute();
         statement.close();
     }
 
-    private static String INSERT_TAG = """
+    private final String INSERT_TAG = """
                 INSERT INTO tags (name)
                 VALUES (?)
                 RETURNING id
                 """;
 
-    public static Tag save(String newTagTitle) throws SQLException {
+    public Tag save(String newTagTitle) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(INSERT_TAG);
         statement.setString(1, newTagTitle);
         Tag newTag = new Tag();
@@ -42,12 +43,12 @@ public class TagRepositoryImpl {
         }
     }
 
-    private static String FIND_TAG = """
+    private final String FIND_TAG = """
             SELECT id FROM tags
             WHERE name = ?
             """;
 
-    public static boolean isTagDuplicate(String name) throws SQLException {
+    public boolean isTagDuplicate(String name) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(FIND_TAG);
         statement.setString(1, name);
 
@@ -60,7 +61,7 @@ public class TagRepositoryImpl {
         }
     }
 
-    public static long getTagId(String name) throws SQLException {
+    public long getTagId(String name) throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(FIND_TAG);
         statement.setString(1, name);
         try (ResultSet resultSet = statement.executeQuery()) {
@@ -72,12 +73,12 @@ public class TagRepositoryImpl {
         return 0;
     }
 
-    public static String DELETE_BY_NAME = """
+    private final String DELETE_BY_NAME = """
             DELETE FROM tags
             WHERE name = ?
             """;
 
-    public static void delete(String tagName) throws SQLException {
+    public void delete(String tagName) throws SQLException {
         PreparedStatement statement = Datasource.getConnection().prepareStatement(DELETE_BY_NAME);
         statement.setString(1,tagName);
         statement.execute();

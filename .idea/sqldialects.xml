@@ -2,10 +2,10 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/25350d1c-776f-4fc9-9c83-2c71749bf77f/console.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/example/repository/ReactionRepository.java" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/example/repository/TagRepository.java" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/example/repository/TweetRepository.java" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/example/repository/Tweet_TagRepository.java" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/java/org/example/repository/UserRepository.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/repository/impl/ReactionRepositoryImpl.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/repository/impl/TagRepositoryImpl.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/repository/impl/TweetRepositoryImpl.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/repository/impl/Tweet_TagRepositoryImpl.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/org/example/repository/impl/UserRepositoryImpl.java" dialect="GenericSQL" />
   </component>
 </project>

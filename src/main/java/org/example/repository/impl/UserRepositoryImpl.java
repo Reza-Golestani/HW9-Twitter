@@ -3,16 +3,17 @@ package org.example.repository.impl;
 import org.apache.commons.codec.binary.Base64;
 import org.example.Datasource;
 import org.example.entity.User;
+import org.example.repository.UserRepository;
 
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserRepositoryImpl {
+public class UserRepositoryImpl implements UserRepository {
 
     Base64 base64 = new Base64();
 
-    private static final String CREATE_TABLE = """
+    private final String CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS users (
             id bigserial PRIMARY KEY NOT NULL,
             email varchar(50) UNIQUE NOT NULL,
@@ -24,13 +25,13 @@ public class UserRepositoryImpl {
             );
             """;
 
-    public static void initTable() throws SQLException {
+    public void initTable() throws SQLException {
         var statement = Datasource.getConnection().prepareStatement(CREATE_TABLE);
         statement.execute();
         statement.close();
     }
 
-    private static String INSERT_SQL = """
+    private final String INSERT_SQL = """
             INSERT INTO users (email, username, password, displayed_name, bio, created_at)
             VALUES (?, ?, ?, ?, ?, ?)
             RETURNING id;
@@ -55,12 +56,12 @@ public class UserRepositoryImpl {
         }
     }
 
-    private static String CHECK_EMAIL_AVAILABILITY_SQL = """
+    private final String CHECK_EMAIL_AVAILABILITY_SQL = """
             SELECT id FROM users
             WHERE email = ?
             """;
 
-private static String CHECK_USERNAME_AVAILABILITY_SQL = """
+    private final String CHECK_USERNAME_AVAILABILITY_SQL = """
             SELECT id FROM users
             WHERE username = ?
             """;
@@ -91,12 +92,12 @@ private static String CHECK_USERNAME_AVAILABILITY_SQL = """
         return true;
     }
 
-    private static String FIND_BY_USERNAME = """
+    private final String FIND_BY_USERNAME = """
             SELECT * FROM users
             WHERE username = ?
             """;
 
-    private static String FIND_BY_EMAIL = """
+    private final String FIND_BY_EMAIL = """
             SELECT * FROM users
             WHERE email = ?
             """;
@@ -105,7 +106,7 @@ private static String CHECK_USERNAME_AVAILABILITY_SQL = """
         var statement = Datasource.getConnection().prepareStatement(FIND_BY_EMAIL);
         statement.setString(1, email);
         try (ResultSet resultSet = statement.executeQuery()) {
-                User user = new User();
+            User user = new User();
             if (resultSet.next()) {
                 user.setId(resultSet.getLong(1));
                 user.setEmail(resultSet.getString(2));
@@ -135,8 +136,8 @@ private static String CHECK_USERNAME_AVAILABILITY_SQL = """
                 user.setDisplayedName(resultSet.getString(5));
                 user.setBio(resultSet.getString(6));
                 user.setCreated(resultSet.getDate(7).toLocalDate());
-            statement.close();
-            return user;
+                statement.close();
+                return user;
             }
             statement.close();
             return null;
@@ -190,8 +191,6 @@ private static String CHECK_USERNAME_AVAILABILITY_SQL = """
         statement.executeUpdate();
         statement.close();
     }
-
-
 
 
 }

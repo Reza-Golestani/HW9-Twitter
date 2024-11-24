@@ -6,15 +6,22 @@ import org.example.repository.impl.ReactionRepositoryImpl;
 import org.example.repository.impl.TagRepositoryImpl;
 import org.example.repository.impl.TweetRepositoryImpl;
 import org.example.repository.impl.Tweet_TagRepositoryImpl;
+import org.example.service.TweetService;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class TweetServiceImpl {
+public class TweetServiceImpl implements TweetService {
 
-    public static Tweet create(String newTweetText, Set<String> tagTitles) {
+    private ReactionRepositoryImpl reactionRepositoryImpl = new ReactionRepositoryImpl();
+    private Tweet_TagRepositoryImpl tweet_tagRepositoryImpl = new Tweet_TagRepositoryImpl();
+    private TagRepositoryImpl tagRepositoryImpl = new TagRepositoryImpl();
+    private TweetRepositoryImpl tweetRepositoryImpl = new TweetRepositoryImpl();
+    private TagServiceImpl tagServiceImpl = new TagServiceImpl();
+
+    public Tweet create(String newTweetText, Set<String> tagTitles) {
         Tweet newTweet = new Tweet();
         newTweet.setText(newTweetText);
         newTweet.setTags(tagTitles);
@@ -23,60 +30,62 @@ public class TweetServiceImpl {
         return newTweet;
     }
 
-    public static void deleteTweet(Tweet tweet) throws SQLException {
+    public void deleteTweet(Tweet tweet) throws SQLException {
 
-        ReactionRepositoryImpl.deleteByTweet(tweet);
-        Tweet_TagRepositoryImpl.deleteByTweet(tweet);
+        reactionRepositoryImpl.deleteByTweet(tweet);
+        tweet_tagRepositoryImpl.deleteByTweet(tweet);
         if (tweet.getTags() != null) {
             for (String tag : tweet.getTags()) {
-                if (Tweet_TagRepositoryImpl.isTagUseless(tweet.getId(), TagRepositoryImpl.getTagId(tag))) {
-                    TagRepositoryImpl.delete(tag);
+                if (tweet_tagRepositoryImpl.isTagUseless(tweet.getId(),
+                        tagRepositoryImpl.getTagId(tag))) {
+                    tagRepositoryImpl.delete(tag);
                 }
             }
         }
         handleDeleteReference(tweet);
-        TweetRepositoryImpl.delete(tweet);
+        tweetRepositoryImpl.delete(tweet);
     }
 
-    private static void handleDeleteReference(Tweet tweet) throws SQLException {
-        TweetRepositoryImpl.handleDeleteReference(tweet.getId());
+    private void handleDeleteReference(Tweet tweet) throws SQLException {
+        tweetRepositoryImpl.handleDeleteReference(tweet.getId());
     }
 
-    public static ArrayList<Tweet> getAll() throws SQLException {
-        return TweetRepositoryImpl.getAllTweets();
+    public ArrayList<Tweet> getAll() throws SQLException {
+        return tweetRepositoryImpl.getAllTweets();
     }
 
-    public static ArrayList<Tweet> getAll(User user) throws SQLException {
-        return TweetRepositoryImpl.getAllTweets(user);
+    public ArrayList<Tweet> getAll(User user) throws SQLException {
+        return tweetRepositoryImpl.getAllTweets(user);
     }
 
 
-    public static void editTags(Tweet tweet, Set<String> newTagTitles) throws SQLException {
-        Tweet_TagRepositoryImpl.deleteByTweet(tweet);
+    public void editTags(Tweet tweet, Set<String> newTagTitles) throws SQLException {
+        tweet_tagRepositoryImpl.deleteByTweet(tweet);
         if (tweet.getTags() != null) {
             for (String tag : tweet.getTags()) {
-                if (Tweet_TagRepositoryImpl.isTagUseless(tweet.getId(), TagRepositoryImpl.getTagId(tag))) {
-                    TagRepositoryImpl.delete(tag);
+                if (tweet_tagRepositoryImpl.isTagUseless(tweet.getId(),
+                        tagRepositoryImpl.getTagId(tag))) {
+                    tagRepositoryImpl.delete(tag);
                 }
             }
         }
         tweet.setTags(newTagTitles);
-        TagServiceImpl.saveTags(tweet);
-        TweetRepositoryImpl.updatedAt(tweet.getId());
+        tagServiceImpl.saveTags(tweet);
+        tweetRepositoryImpl.updatedAt(tweet.getId());
         tweet.setEditedAt(LocalDateTime.now());
     }
 
-    public static void editText(Tweet tweet, String newText) throws SQLException {
-        TweetRepositoryImpl.editText(tweet.getId(), newText);
-        TweetRepositoryImpl.updatedAt(tweet.getId());
+    public void editText(Tweet tweet, String newText) throws SQLException {
+        tweetRepositoryImpl.editText(tweet.getId(), newText);
+        tweetRepositoryImpl.updatedAt(tweet.getId());
         tweet.setEditedAt(LocalDateTime.now());
     }
 
-    public static void setRetweeted(long tweetId, long retweetedId) throws SQLException {
-        TweetRepositoryImpl.setRetweeted(tweetId, retweetedId);
+    public void setRetweeted(long tweetId, long retweetedId) throws SQLException {
+        tweetRepositoryImpl.setRetweeted(tweetId, retweetedId);
     }
 
-    public static long save(Tweet newTweet) throws SQLException {
-        return TweetRepositoryImpl.save(newTweet).getId();
+    public long save(Tweet newTweet) throws SQLException {
+        return tweetRepositoryImpl.save(newTweet).getId();
     }
 }
