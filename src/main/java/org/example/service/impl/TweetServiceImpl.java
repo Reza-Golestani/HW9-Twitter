@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import org.example.entity.Tweet;
 import org.example.entity.User;
+import org.example.exception.AllowableTweetLengthException;
 import org.example.repository.impl.ReactionRepositoryImpl;
 import org.example.repository.impl.TagRepositoryImpl;
 import org.example.repository.impl.TweetRepositoryImpl;
@@ -95,5 +96,12 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public long save(Tweet newTweet) throws SQLException {
         return tweetRepositoryImpl.save(newTweet).getId();
+    }
+
+    @Override
+    public void tweetLengthCheck(long tweetLength){
+        if (tweetLength > 280)
+            throw new AllowableTweetLengthException("Too long tweet! Max allowed length is 280 " +
+                    "characters, try again: ");
     }
 }

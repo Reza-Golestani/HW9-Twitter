@@ -3,6 +3,9 @@ package org.example;
 import org.apache.commons.codec.EncoderException;
 import org.example.entity.Tweet;
 import org.example.entity.User;
+import org.example.exception.AllowableTweetLengthException;
+import org.example.exception.DuplicateEmailUsernameException;
+import org.example.exception.WrongUsernameOrPasswordException;
 import org.example.repository.impl.*;
 import org.example.service.impl.ReactionServiceImpl;
 import org.example.service.impl.TagServiceImpl;
@@ -75,17 +78,28 @@ public class Main {
 
         System.out.print("Please enter your email: ");
         String email = sc.nextLine();
-        while (!userServiceImpl.isEmailAvailable(email)) {
-            System.out.print("This email is already in use. Try another one: ");
-            email = sc.nextLine();
+
+        while (true) {
+            try {
+                userServiceImpl.isEmailAvailable(email);
+                break;
+            } catch (DuplicateEmailUsernameException e) {
+                System.out.println(e.getMessage());
+                email = sc.nextLine();
+            }
         }
         user.setEmail(email);
 
         System.out.print("Please enter your username: ");
         String username = sc.nextLine();
-        while (!userServiceImpl.isUsernameAvailable(username)) {
-            System.out.print("This username is already in use. Try another one: ");
-            username = sc.nextLine();
+        while (true) {
+            try {
+                userServiceImpl.isUsernameAvailable(username);
+                break;
+            } catch (DuplicateEmailUsernameException e) {
+                System.out.println(e.getMessage());
+                username = sc.nextLine();
+            }
         }
         user.setUsername(username);
 
@@ -116,13 +130,11 @@ public class Main {
         String emailOrUsername = sc.nextLine();
         System.out.print("Please enter your password: ");
         String password = sc.nextLine();
-        if (userServiceImpl.signIn(emailOrUsername, password)) {
+        try {
+            userServiceImpl.signIn(emailOrUsername, password);
             System.out.println("\n>>> Logged in successfully!");
-        }
-        ;
-
-        if (UserServiceImpl.loggedInUser == null) {
-            System.out.println("\n>>> Invalid email/username or password!");
+        } catch (WrongUsernameOrPasswordException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -263,9 +275,14 @@ public class Main {
         } else if (choice.equals("1")) {
             System.out.println("\nEnter your new text (Max: 280 characters): ");
             newText = sc.nextLine();
-            while (newText.length() > 280) {
-                System.out.println("Too long tweet! Max allowed length is 280 characters, try again: ");
-                newText = sc.nextLine();
+            while (true) {
+                try {
+                    tweetServiceImpl.tweetLengthCheck(newText.length());
+                    break;
+                } catch (AllowableTweetLengthException e) {
+                    System.out.println(e.getMessage());
+                    newText = sc.nextLine();
+                }
             }
         } else if (choice.equals("2")) {
             System.out.println("\nEnter new tags (enter '0' to finish): ");
@@ -313,9 +330,14 @@ public class Main {
         if (choice.equals("1")) {
             System.out.print("Enter your new email: ");
             String newEmail = sc.nextLine();
-            while (!userServiceImpl.isEmailAvailable(newEmail)) {
-                System.out.print("This email is already in use. Try another one: ");
-                newEmail = sc.nextLine();
+            while (true) {
+                try {
+                    userServiceImpl.isEmailAvailable(newEmail);
+                    break;
+                } catch (DuplicateEmailUsernameException e) {
+                    System.out.println(e.getMessage());
+                    newEmail = sc.nextLine();
+                }
             }
             UserServiceImpl.loggedInUser.setEmail(newEmail);
             userServiceImpl.updateUser(UserServiceImpl.loggedInUser);
@@ -323,19 +345,27 @@ public class Main {
         } else if (choice.equals("2")) {
             System.out.print("Enter your new username: ");
             String newUsername = sc.nextLine();
-            while (!userServiceImpl.isUsernameAvailable(newUsername)) {
-                System.out.print("This username is already in use. Try another one: ");
-                newUsername = sc.nextLine();
+            while (true) {
+                try {
+                    userServiceImpl.isUsernameAvailable(newUsername);
+                    break;
+                } catch (DuplicateEmailUsernameException e) {
+                    System.out.println(e.getMessage());
+                    newUsername = sc.nextLine();
+                }
             }
             UserServiceImpl.loggedInUser.setUsername(newUsername);
             userServiceImpl.updateUser(UserServiceImpl.loggedInUser);
         } else if (choice.equals("3")) {
             System.out.print("Enter your old password: ");
             String oldPassword = sc.nextLine();
-            if (!UserServiceImpl.loggedInUser.getPassword().equals(oldPassword)) {
-                System.out.println(">>> Wrong password!");
+            try {
+                userServiceImpl.oldPasswordCheck(oldPassword);
+            } catch (WrongUsernameOrPasswordException e) {
+                System.out.println(e.getMessage());
                 editProfileMenu();
             }
+
             System.out.print("Enter your new password: ");
             String newPassword = sc.nextLine();
             UserServiceImpl.loggedInUser.setPassword(newPassword);
@@ -367,9 +397,14 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("\nEnter your new tweet (Max: 280 characters): ");
         String newTweetText = sc.nextLine();
-        while (newTweetText.length() > 280) {
-            System.out.println("Too long tweet! Max allowed length is 280 characters, try again: ");
-            newTweetText = sc.nextLine();
+        while (true) {
+            try {
+                tweetServiceImpl.tweetLengthCheck(newTweetText.length());
+                break;
+            } catch (AllowableTweetLengthException e) {
+                System.out.println(e.getMessage());
+                newTweetText = sc.nextLine();
+            }
         }
         System.out.println("Enter tags (enter '0' to finish): ");
         Set<String> tagTitles = new HashSet<>();

@@ -27,4 +27,6 @@ public interface TweetService {
 
     long save(Tweet newTweet) throws SQLException;
 
+    void tweetLengthCheck(long tweetLength);
+
 }
